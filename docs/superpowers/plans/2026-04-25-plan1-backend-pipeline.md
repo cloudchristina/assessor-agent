@@ -2249,11 +2249,11 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
 - Create: `src/agent_narrator/tools.py`
 - Create: `tests/unit/test_agent_tools.py`
 
-- [ ] **Step 1: Failing tests** — `get_finding(id)` returns a `Finding`-shaped dict from DDB; `get_ism_control("ISM-1546")` returns the catalogue entry; `get_rule_spec("R1")` returns rule metadata; `get_prior_cycle_summary("run_x")` returns `RulesEngineOutput` from S3.
+- [x] **Step 1: Failing tests** — `get_finding(id)` returns a `Finding`-shaped dict from DDB; `get_ism_control("ISM-1546")` returns the catalogue entry; `get_rule_spec("R1")` returns rule metadata; `get_prior_cycle_summary("run_x")` returns `RulesEngineOutput` from S3.
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement** — four tools, each decorated `@tool`, each with `from src.shared.logging import get_logger` for span emission. The tools read from DDB (`findings` table) and S3 (prior runs); they MUST NOT write.
+- [x] **Step 3: Implement** — four tools, each decorated `@tool`, each with `from src.shared.logging import get_logger` for span emission. The tools read from DDB (`findings` table) and S3 (prior runs); they MUST NOT write.
 
 ```python
 """Strands tools — read-only. Adding a tool here is an architecture decision."""
@@ -2303,9 +2303,9 @@ def get_prior_cycle_summary(prior_run_id: str) -> dict:
     return json.loads(obj["Body"].read())
 ```
 
-- [ ] **Step 4: Passes** (mock DDB + S3 with moto)
+- [x] **Step 4: Passes** (mock DDB + S3 with moto)
 
-- [ ] **Step 5: Commit** `feat(agent): add four read-only Strands tools`
+- [x] **Step 5: Commit** `feat(agent): add four read-only Strands tools`
 
 ---
 
