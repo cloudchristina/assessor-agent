@@ -50,14 +50,22 @@ def _event():
     }
 
 
+def _agent_result(score: JudgeScore) -> MagicMock:
+    """Mimic strands.AgentResult — only the attribute we use."""
+    res = MagicMock()
+    res.structured_output = score
+    return res
+
+
 @mock_aws
 def test_faithful_narrative_passes():
     _setup_s3()
-    fake_agent = MagicMock()
-    fake_agent.structured_output.return_value = _faithful_score()
+    fake_agent = MagicMock(return_value=_agent_result(_faithful_score()))
     with patch("src.judge.handler._build_agent", return_value=fake_agent):
         from src.judge.handler import lambda_handler
         out = lambda_handler(_event(), None)
+    fake_agent.assert_called_once()
+    assert fake_agent.call_args.kwargs.get("structured_output_model") is JudgeScore
     assert out["passed"] is True
     assert out["passed_int"] == 1
     assert out["faithfulness"] >= 0.9
@@ -66,8 +74,7 @@ def test_faithful_narrative_passes():
 @mock_aws
 def test_fabricated_narrative_fails():
     _setup_s3()
-    fake_agent = MagicMock()
-    fake_agent.structured_output.return_value = _fabricated_score()
+    fake_agent = MagicMock(return_value=_agent_result(_fabricated_score()))
     with patch("src.judge.handler._build_agent", return_value=fake_agent):
         from src.judge.handler import lambda_handler
         out = lambda_handler(_event(), None)

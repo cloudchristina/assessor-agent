@@ -2,6 +2,10 @@
 from __future__ import annotations
 import json
 import os
+# Must come BEFORE `from strands import ...` so the OTel TracerProvider is
+# set before Strands reads it via get_tracer_provider().
+import src.shared.otel_init  # noqa: F401
+
 from urllib.parse import urlparse
 import boto3
 from strands import Agent
@@ -42,7 +46,10 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
     narrative = _read_json(event["narrative_s3_uri"])
     user = json.dumps({"findings": findings, "narrative": narrative})
     agent = _build_agent()
-    score: JudgeScore = agent.structured_output(JudgeScore, user)
+    # Modern Strands API — emits OTel spans for the model call (the deprecated
+    # structured_output() bypasses telemetry).
+    result = agent(user, structured_output_model=JudgeScore)
+    score: JudgeScore = result.structured_output
     passed = _passed(score)
     log.info("judge.done", extra={"passed": passed, **score.model_dump(exclude={"reasoning"})})
     return {
