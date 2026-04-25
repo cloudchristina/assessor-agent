@@ -2170,16 +2170,16 @@ This is the contract the SFN `ExtractUar` state's `ResultSelector` (Task 9.9) pr
 - Create: `src/validate_and_hash/handler.py`
 - Create: `tests/unit/test_validate_and_hash.py`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 Cases:
 1. Valid CSV + matching manifest → returns `{run_id, rows_s3_uri, manifest}`, writes `validated/<run_id>.json` with `{run_id, rows: [...]}`.
 2. Hash mismatch → raises `RuntimeError("manifest_hash_mismatch")`.
 3. Schema violation (bad row) → raises with offending row index.
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """C2 — parse CSV, Pydantic-validate every row, recompute hash, compare to manifest."""
@@ -2234,9 +2234,9 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
     }
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(validate): add validate-and-hash Lambda (C2)`
+- [x] **Step 5: Commit** `feat(validate): add validate-and-hash Lambda (C2)`
 
 ---
 
