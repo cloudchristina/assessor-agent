@@ -718,7 +718,7 @@ git commit -m "feat(shared): add UARRow and ExtractManifest Pydantic models"
 - Modify: `src/shared/models.py`
 - Modify: `tests/unit/test_models.py`
 
-- [ ] **Step 1: Add failing tests**
+- [x] **Step 1: Add failing tests**
 
 ```python
 from src.shared.models import Finding, RulesEngineOutput
@@ -749,14 +749,14 @@ def test_rules_engine_output_summary_consistent():
     assert out.findings == []
 ```
 
-- [ ] **Step 2: Run — confirm fails**
+- [x] **Step 2: Run — confirm fails**
 
 ```bash
 pytest tests/unit/test_models.py -v
 ```
 Expected: `ImportError`.
 
-- [ ] **Step 3: Implement** — add to `models.py`:
+- [x] **Step 3: Implement** — add to `models.py`:
 
 ```python
 class Finding(BaseModel):
@@ -781,9 +781,9 @@ class RulesEngineOutput(BaseModel):
     databases_scanned: int
 ```
 
-- [ ] **Step 4: Run — passes**
+- [x] **Step 4: Run — passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git commit -am "feat(shared): add Finding and RulesEngineOutput models"

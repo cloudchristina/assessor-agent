@@ -1,7 +1,12 @@
 from datetime import datetime
 import pytest
 from pydantic import ValidationError
-from src.shared.models import UARRow, ExtractManifest
+from src.shared.models import (
+    UARRow,
+    ExtractManifest,
+    Finding,
+    RulesEngineOutput,
+)
 
 
 def test_uar_row_accepts_minimal_valid():
@@ -64,3 +69,29 @@ def test_extract_manifest_round_trip():
     )
     assert m.model_dump_json()
     assert ExtractManifest.model_validate_json(m.model_dump_json()) == m
+
+
+def test_finding_id_format_validated():
+    f = Finding(
+        finding_id="F-run_2026-04-25_weekly-R1-0001",
+        run_id="run_2026-04-25_weekly",
+        rule_id="R1",
+        severity="CRITICAL",
+        ism_controls=["ISM-1546"],
+        principal="alice",
+        databases=["appdb"],
+        evidence={"login_type": "SQL_LOGIN"},
+        detected_at=datetime(2026, 4, 25),
+    )
+    assert f.severity == "CRITICAL"
+
+
+def test_rules_engine_output_summary_consistent():
+    out = RulesEngineOutput(
+        run_id="run_2026-04-25_weekly",
+        findings=[],
+        summary={"R1": 0, "CRITICAL": 0},
+        principals_scanned=0,
+        databases_scanned=0,
+    )
+    assert out.findings == []

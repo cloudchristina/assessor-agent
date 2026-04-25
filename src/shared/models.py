@@ -37,3 +37,25 @@ class ExtractManifest(BaseModel):
     row_count: int
     row_ids_sha256: str
     schema_version: str
+
+
+class Finding(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    finding_id: str
+    run_id: str
+    rule_id: Literal["R1", "R2", "R3", "R4", "R5", "R6"]
+    severity: Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+    ism_controls: list[str]
+    principal: str
+    databases: list[str]
+    evidence: dict[str, Any]
+    detected_at: datetime
+
+
+class RulesEngineOutput(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    run_id: str
+    findings: list[Finding]
+    summary: dict[str, int]
+    principals_scanned: int
+    databases_scanned: int
