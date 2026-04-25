@@ -9,6 +9,7 @@ dependencies = [
     "pymssql>=2.3",
     "strands-agents>=1.0",
     "reportlab>=4.0",
+    "tenacity>=9.0",
 ]
 
 [project.optional-dependencies]

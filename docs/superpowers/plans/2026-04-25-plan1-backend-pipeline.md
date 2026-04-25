@@ -1928,15 +1928,15 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
 - Create: `src/extract_uar/access_logic.py`
 - Create: `tests/unit/test_extract_helpers.py`
 
-- [ ] **Step 1: Failing tests** — covering `summarize_permissions`, `derive_access_level`, `sid_hex`, `fmt_dt` with explicit cases (sysadmin → Admin; db_owner → Admin; db_datawriter → Write; db_datareader → ReadOnly; default → Unknown; explicit_admin → Admin overrides default).
+- [x] **Step 1: Failing tests** — covering `summarize_permissions`, `derive_access_level`, `sid_hex`, `fmt_dt` with explicit cases (sysadmin → Admin; db_owner → Admin; db_datawriter → Write; db_datareader → ReadOnly; default → Unknown; explicit_admin → Admin overrides default).
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement** — clean copy of `summarize_permissions` / `derive_access_level` / `sid_hex` / `fmt_dt` from the user's existing code, with type annotations and `from __future__ import annotations`. Pure functions only, no imports of boto3/pymssql.
+- [x] **Step 3: Implement** — clean copy of `summarize_permissions` / `derive_access_level` / `sid_hex` / `fmt_dt` from the user's existing code, with type annotations and `from __future__ import annotations`. Pure functions only, no imports of boto3/pymssql.
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(extract): extract pure permission/access helpers with tests`
+- [x] **Step 5: Commit** `feat(extract): extract pure permission/access helpers with tests`
 
 ---
 
