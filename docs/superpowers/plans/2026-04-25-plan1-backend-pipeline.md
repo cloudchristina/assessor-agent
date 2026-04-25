@@ -2641,16 +2641,16 @@ Cases:
 - Create: `infra/terraform/modules/kms/variables.tf`
 - Create: `infra/terraform/modules/kms/outputs.tf`
 
-- [ ] **Step 1: Write module** — three CMKs: `raw`, `findings`, `reports`. Each with KMS key + alias + key policy granting the account root + a list of role ARNs (passed in as `principal_arns`). Rotation enabled.
+- [x] **Step 1: Write module** — three CMKs: `raw`, `findings`, `reports`. Each with KMS key + alias + key policy granting the account root + a list of role ARNs (passed in as `principal_arns`). Rotation enabled.
 
-- [ ] **Step 2: Validate**
+- [x] **Step 2: Validate**
 
 ```bash
 cd infra/terraform/modules/kms && terraform init -backend=false && terraform validate
 tflint && tfsec .
 ```
 
-- [ ] **Step 3: Commit** `feat(infra): add KMS module with raw/findings/reports CMKs`
+- [x] **Step 3: Commit** `feat(infra): add KMS module with raw/findings/reports CMKs`
 
 ---
 
@@ -2659,14 +2659,14 @@ tflint && tfsec .
 **Files:**
 - Create: `infra/terraform/modules/s3_buckets/{main,variables,outputs}.tf`
 
-- [ ] **Step 1: Write module** — two buckets:
+- [x] **Step 1: Write module** — two buckets:
   - `runs` bucket: versioning ON, SSE-KMS with `raw` CMK (then `findings` CMK applied at object level via Lambda), public-access fully blocked, lifecycle to expire `validated/` objects after 30 days.
   - `reports` bucket: versioning ON, SSE-KMS with `reports` CMK, public-access blocked, **Object Lock enabled (Governance mode, default 7 years)**.
 - Outputs: `runs_bucket_name`, `reports_bucket_name`, ARNs.
 
-- [ ] **Step 2: Validate (tfsec must pass with no Object Lock warnings on reports)**
+- [x] **Step 2: Validate (tfsec must pass with no Object Lock warnings on reports)**
 
-- [ ] **Step 3: Commit** `feat(infra): add S3 module with runs+reports buckets and Object Lock`
+- [x] **Step 3: Commit** `feat(infra): add S3 module with runs+reports buckets and Object Lock`
 
 ---
 
@@ -2675,16 +2675,16 @@ tflint && tfsec .
 **Files:**
 - Create: `infra/terraform/modules/dynamodb/{main,variables,outputs}.tf`
 
-- [ ] **Step 1: Write module**
+- [x] **Step 1: Write module**
 
 - `runs` table: PK `run_id` (S), billing PAY_PER_REQUEST, point-in-time recovery enabled, server-side encryption with `findings` CMK.
 - `findings` table: PK `run_id` (S), SK `finding_id` (S), GSI `severity_index` PK `severity` SK `detected_at`, PAY_PER_REQUEST, PITR on, KMS-encrypted.
 
 > **Attribute type note:** the spec Section 4.2 lists `databases` and `ism_controls` as `SS` (String Set). DynamoDB does not allow empty string sets, and boto3 requires explicit `set()` for SS. Plan 1 stores these as **List of String (`L`)** instead — it round-trips Python `list[str]` from `Finding.model_dump()` cleanly via `boto3.resource("dynamodb").Table().put_item()`, accepts empty lists, and behaves identically for query/scan filter expressions (`contains(databases, :v)`). This is a documented Plan 1 deviation from the spec; the spec will be updated in lock-step at execution time.
 
-- [ ] **Step 2: Validate**
+- [x] **Step 2: Validate**
 
-- [ ] **Step 3: Commit** `feat(infra): add DynamoDB module with runs and findings tables`
+- [x] **Step 3: Commit** `feat(infra): add DynamoDB module with runs and findings tables`
 
 ---
 
@@ -2693,9 +2693,9 @@ tflint && tfsec .
 **Files:**
 - Create: `infra/terraform/modules/secrets/{main,variables,outputs}.tf`
 
-- [ ] **Step 1: Write module** — creates one Secrets Manager secret per server config (input: `list(object({name, host, port, username, databases}))`). Initial value is a placeholder; real password populated out-of-band. Outputs ARNs.
+- [x] **Step 1: Write module** — creates one Secrets Manager secret per server config (input: `list(object({name, host, port, username, databases}))`). Initial value is a placeholder; real password populated out-of-band. Outputs ARNs.
 
-- [ ] **Step 2: Validate + commit** `feat(infra): add Secrets Manager module for SQL Server credentials`
+- [x] **Step 2: Validate + commit** `feat(infra): add Secrets Manager module for SQL Server credentials`
 
 ---
 
@@ -2716,9 +2716,9 @@ tflint && tfsec .
 **Files (this task creates a stub only):**
 - Create: `infra/terraform/modules/vpc/README.md`
 
-- [ ] **Step 1: Write `modules/vpc/README.md`** — single-page note explaining the deferred decision and what to build when promoting to production.
+- [x] **Step 1: Write `modules/vpc/README.md`** — single-page note explaining the deferred decision and what to build when promoting to production.
 
-- [ ] **Step 2: Commit** `docs(infra): document deferred VPC module for production evolution`
+- [x] **Step 2: Commit** `docs(infra): document deferred VPC module for production evolution`
 
 ---
 
@@ -2727,7 +2727,7 @@ tflint && tfsec .
 **Files:**
 - Create: `infra/terraform/modules/iam_roles/{main,variables,outputs}.tf`
 
-- [ ] **Step 1: Write module** — one role per Lambda with least-privilege policy:
+- [x] **Step 1: Write module** — one role per Lambda with least-privilege policy:
 
 | Role | Allowed actions |
 |---|---|
@@ -2743,7 +2743,7 @@ tflint && tfsec .
 
 All roles include a permissions boundary policy that denies `iam:*` and `kms:Schedule*`. **No** `ec2:*` or VPC ENI permissions are required because Lambdas run outside any VPC for the demo (see Task 9.5).
 
-- [ ] **Step 2: Validate + commit** `feat(infra): add IAM roles module with per-Lambda least privilege`
+- [x] **Step 2: Validate + commit** `feat(infra): add IAM roles module with per-Lambda least privilege`
 
 ---
 
@@ -2752,13 +2752,13 @@ All roles include a permissions boundary policy that denies `iam:*` and `kms:Sch
 **Files:**
 - Create: `infra/terraform/modules/bedrock_guardrail/{main,variables,outputs}.tf`
 
-- [ ] **Step 1: Write module** — `aws_bedrock_guardrail` with:
+- [x] **Step 1: Write module** — `aws_bedrock_guardrail` with:
   - PII redaction filter
   - Content policy: high blocked-topic for prompt injection ("ignore previous instructions" patterns)
   - Contextual grounding policy: enabled
   - Output denied-topics: agent providing remediation outside compliance scope
 
-- [ ] **Step 2: Validate + commit** `feat(infra): add Bedrock Guardrail module with PII + injection filters`
+- [x] **Step 2: Validate + commit** `feat(infra): add Bedrock Guardrail module with PII + injection filters`
 
 ---
 
@@ -2769,7 +2769,7 @@ All roles include a permissions boundary policy that denies `iam:*` and `kms:Sch
 **Files:**
 - Create: `infra/terraform/modules/lambda_function/{main,variables,outputs}.tf`
 
-- [ ] **Step 1: Write Lambda module** — generic module wrapping `aws_lambda_function` with:
+- [x] **Step 1: Write Lambda module** — generic module wrapping `aws_lambda_function` with:
   - Runtime `python3.13`, architecture `arm64`, memory 1024 MB default (override per Lambda)
   - **No VPC config for demo** (see Task 9.5)
   - Powertools layer + ADOT layer for `agent_narrator` (and `reviewer-chat` in Plan 3)
@@ -2779,7 +2779,7 @@ All roles include a permissions boundary policy that denies `iam:*` and `kms:Sch
   - Dead-letter queue (SQS, also created in module)
   - Inputs: `name`, `handler`, `source_s3_bucket`, `source_s3_key`, `role_arn`, `env`, `memory`, `timeout`, `layers`.
 
-- [ ] **Step 2: Validate + commit** `feat(infra): add lambda_function module`
+- [x] **Step 2: Validate + commit** `feat(infra): add lambda_function module`
 
 ---
 
@@ -2790,7 +2790,7 @@ All roles include a permissions boundary policy that denies `iam:*` and `kms:Sch
 **Files:**
 - Create: `infra/terraform/modules/lambda_artefacts/{main,variables,outputs}.tf`
 
-- [ ] **Step 1: Write `variables.tf`**
+- [x] **Step 1: Write `variables.tf`**
 
 ```hcl
 variable "deploy_bucket" {
@@ -2811,7 +2811,7 @@ variable "lambdas" {
 }
 ```
 
-- [ ] **Step 2: Write `main.tf`**
+- [x] **Step 2: Write `main.tf`**
 
 ```hcl
 locals {
@@ -2835,7 +2835,7 @@ module "package" {
 }
 ```
 
-- [ ] **Step 3: Write `outputs.tf`**
+- [x] **Step 3: Write `outputs.tf`**
 
 > **Note on community-module outputs (verify against your installed version):** `terraform-aws-modules/lambda/aws` v7.x exposes `s3_object` (an object with `bucket`, `key`, `etag`) and `local_filename` for the on-disk zip. The hash is best derived from `filebase64sha256(module.package[name].local_filename)`. If your version differs, check `terraform output` after a sample apply and adjust.
 
@@ -2852,13 +2852,13 @@ output "artefacts" {
 }
 ```
 
-- [ ] **Step 4: Validate**
+- [x] **Step 4: Validate**
 
 ```bash
 cd infra/terraform/modules/lambda_artefacts && terraform init -backend=false && terraform validate
 ```
 
-- [ ] **Step 5: Commit** `feat(infra): add lambda_artefacts module using terraform-aws-modules/lambda for packaging`
+- [x] **Step 5: Commit** `feat(infra): add lambda_artefacts module using terraform-aws-modules/lambda for packaging`
 
 ---
 
