@@ -2460,16 +2460,16 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
 - Create: `src/judge/handler.py`
 - Create: `tests/unit/test_judge.py`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 Cases:
 1. Faithful narrative (every claim grounded) → faithfulness ≥ 0.9, judge passes.
 2. Narrative invents a finding (mocked Bedrock returns low score) → handler returns `passed=False`.
 3. Bedrock throttle exception → retried 3× via tenacity.
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `prompts.py`:
 ```python
@@ -2528,9 +2528,9 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
     return {"gate": "judge", "passed": passed, **score.model_dump()}
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(judge): add judge Lambda (C7) with Haiku 4.5 and threshold gating`
+- [x] **Step 5: Commit** `feat(judge): add judge Lambda (C7) with Haiku 4.5 and threshold gating`
 
 ---
 
