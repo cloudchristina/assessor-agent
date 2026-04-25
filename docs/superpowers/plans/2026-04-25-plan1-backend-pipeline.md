@@ -2315,11 +2315,11 @@ def get_prior_cycle_summary(prior_run_id: str) -> dict:
 - Create: `src/agent_narrator/prompts.py`
 - Create: `tests/unit/test_agent_prompts.py`
 
-- [ ] **Step 1: Failing tests** — `build_system_prompt()` includes the bullet "you must not invent finding IDs", "every claim must cite a finding_id", "you may only call get_finding/get_ism_control/get_rule_spec/get_prior_cycle_summary"; `build_user_prompt(summary)` mentions counts and finding IDs but **does not** include any UARRow data.
+- [x] **Step 1: Failing tests** — `build_system_prompt()` includes the bullet "you must not invent finding IDs", "every claim must cite a finding_id", "you may only call get_finding/get_ism_control/get_rule_spec/get_prior_cycle_summary"; `build_user_prompt(summary)` mentions counts and finding IDs but **does not** include any UARRow data.
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """Narrator prompt builders. Tightly constrained — no UARRow content ever passed to the model."""
@@ -2360,9 +2360,9 @@ def build_user_prompt(run_id: str, summary: dict[str, int], finding_ids: list[st
     return "\n".join(lines)
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(agent): add system + user prompt builders with hard guardrails`
+- [x] **Step 5: Commit** `feat(agent): add system + user prompt builders with hard guardrails`
 
 ---
 
