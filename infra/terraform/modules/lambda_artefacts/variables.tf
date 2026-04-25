@@ -25,6 +25,7 @@ variable "lambdas" {
     env      = map(string)
     memory   = number
     timeout  = number
+    layers   = optional(list(string), [])
   }))
-  description = "Keyed by logical lambda name (snake_case). env is passed through to Lambda config."
+  description = "Keyed by logical lambda name (snake_case). env is passed through to Lambda config. layers is an optional list of layer ARNs (e.g. the ADOT Python layer for OTel auto-instrumentation)."
 }

@@ -113,7 +113,7 @@ data "aws_iam_policy_document" "extract_uar" {
     resources = ["${var.runs_bucket_arn}/fixtures/*"]
   }
   statement {
-    effect    = "Allow"
+    effect = "Allow"
     # Decrypt for reading the synthetic-data fixture object back from S3.
     actions   = ["kms:Encrypt", "kms:Decrypt", "kms:GenerateDataKey"]
     resources = [var.kms_raw_arn]

@@ -125,19 +125,35 @@ module "lambda_artefacts" {
       role_arn = module.iam_roles.lambda_role_arns[k]
       memory   = spec.memory
       timeout  = spec.timeout
+      # ADOT Python arm64 layer for OTel auto-instrumentation. Attached only
+      # to Lambdas where Strands emits tool/model OTel spans we want to see in
+      # X-Ray. Layer ARN is a sourceable AWS-managed layer; pin via
+      # var.adot_python_layer_arn.
+      layers = contains(["agent_narrator", "judge"], k) ? [var.adot_python_layer_arn] : []
       env = merge(
         {
           POWERTOOLS_SERVICE_NAME = k
           RUNS_BUCKET             = module.s3_buckets.runs_bucket_name
         },
         k == "extract_uar" ? {
-          SECRETS_MANAGER_ARNS = jsonencode(module.secrets.secret_arns)
+          SECRETS_MANAGER_ARNS  = jsonencode(module.secrets.secret_arns)
+          SYNTHETIC_DATA_S3_URI = "s3://${module.s3_buckets.runs_bucket_name}/fixtures/synth.csv"
         } : {},
         contains(["agent_narrator", "publish_triage"], k) ? {
           FINDINGS_TABLE = module.dynamodb.findings_table_name
         } : {},
         k == "publish_triage" ? {
           RUNS_TABLE = module.dynamodb.runs_table_name
+        } : {},
+        # OTel auto-instrumentation: AWS_LAMBDA_EXEC_WRAPPER tells the Lambda
+        # runtime to chain through ADOT's Python wrapper before invoking the
+        # handler, which initialises the OTel SDK with an OTLP exporter
+        # pointing at the in-process ADOT collector. Strands' get_tracer()
+        # then emits agent/tool/model spans that ADOT forwards to X-Ray.
+        contains(["agent_narrator", "judge"], k) ? {
+          AWS_LAMBDA_EXEC_WRAPPER  = "/opt/otel-instrument"
+          OTEL_RESOURCE_ATTRIBUTES = "service.name=${k},service.namespace=assessor-agent"
+          OTEL_PROPAGATORS         = "xray,tracecontext"
         } : {},
         k == "agent_narrator" ? {
           BEDROCK_GUARDRAIL_ID = module.bedrock_guardrail.guardrail_id

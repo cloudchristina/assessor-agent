@@ -47,6 +47,8 @@ module "fn" {
 
   environment_variables = each.value.env
 
+  layers = each.value.layers
+
   tracing_mode = "Active"
 
   attach_dead_letter_policy = true
