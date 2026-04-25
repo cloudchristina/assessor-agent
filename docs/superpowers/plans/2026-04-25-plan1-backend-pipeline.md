@@ -2543,11 +2543,11 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
 - Create: `src/publish_triage/handler.py`
 - Create: `tests/unit/test_publish.py`
 
-- [ ] **Step 1: Failing test** (moto DDB) — handler reads findings.json + narrative.json + judge result + gate results, writes one row to `runs` table and N rows to `findings` table.
+- [x] **Step 1: Failing test** (moto DDB) — handler reads findings.json + narrative.json + judge result + gate results, writes one row to `runs` table and N rows to `findings` table.
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """C9 — publish-triage. Writes runs + findings to DDB."""
@@ -2599,9 +2599,9 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
     return {"run_id": event["run_id"], "findings_count": len(findings)}
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(publish): add publish-triage Lambda (C9)`
+- [x] **Step 5: Commit** `feat(publish): add publish-triage Lambda (C9)`
 
 ---
 
