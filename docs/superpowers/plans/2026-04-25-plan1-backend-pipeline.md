@@ -797,7 +797,7 @@ git commit -am "feat(shared): add Finding and RulesEngineOutput models"
 - Modify: `src/shared/models.py`
 - Modify: `tests/unit/test_models.py`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 ```python
 from src.shared.models import (
@@ -827,9 +827,9 @@ def test_judge_score_bounds():
     assert 0 <= s.faithfulness <= 1
 ```
 
-- [ ] **Step 2: Run — fails (imports)**
+- [x] **Step 2: Run — fails (imports)**
 
-- [ ] **Step 3: Implement** — append to `models.py`:
+- [x] **Step 3: Implement** — append to `models.py`:
 
 ```python
 class NarrativeFindingRef(BaseModel):
@@ -877,9 +877,9 @@ class TriageDecision(BaseModel):
     decided_at: datetime
 ```
 
-- [ ] **Step 4: Run — passes**
+- [x] **Step 4: Run — passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git commit -am "feat(shared): add NarrativeReport/JudgeScore/TriageDecision models"

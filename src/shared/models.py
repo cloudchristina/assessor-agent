@@ -59,3 +59,48 @@ class RulesEngineOutput(BaseModel):
     summary: dict[str, int]
     principals_scanned: int
     databases_scanned: int
+
+
+class NarrativeFindingRef(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    finding_id: str
+    group_theme: str | None
+    remediation: str
+    ism_citation: str
+
+
+class ThemeCluster(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    theme: str
+    finding_ids: list[str]
+    summary: str
+
+
+class NarrativeReport(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    run_id: str
+    executive_summary: str
+    theme_clusters: list[ThemeCluster]
+    finding_narratives: list[NarrativeFindingRef]
+    cycle_over_cycle: str | None
+    total_findings: int
+    model_id: str
+    generated_at: datetime
+
+
+class JudgeScore(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    faithfulness: float
+    completeness: float
+    fabrication: float
+    reasoning: str
+    model_id: str
+
+
+class TriageDecision(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    finding_id: str
+    reviewer_sub: str
+    decision: Literal["confirmed_risk", "false_positive", "accepted_exception", "escalated"]
+    rationale: str
+    decided_at: datetime

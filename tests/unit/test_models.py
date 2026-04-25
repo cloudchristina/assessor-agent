@@ -6,6 +6,11 @@ from src.shared.models import (
     ExtractManifest,
     Finding,
     RulesEngineOutput,
+    NarrativeReport,
+    NarrativeFindingRef,
+    ThemeCluster,
+    JudgeScore,
+    TriageDecision,
 )
 
 
@@ -95,3 +100,25 @@ def test_rules_engine_output_summary_consistent():
         databases_scanned=0,
     )
     assert out.findings == []
+
+
+def test_narrative_report_minimal():
+    r = NarrativeReport(
+        run_id="run_2026-04-25_weekly",
+        executive_summary="No findings.",
+        theme_clusters=[],
+        finding_narratives=[],
+        cycle_over_cycle=None,
+        total_findings=0,
+        model_id="claude-sonnet-4-6",
+        generated_at=datetime(2026, 4, 25),
+    )
+    assert r.total_findings == 0
+
+
+def test_judge_score_bounds():
+    s = JudgeScore(
+        faithfulness=0.95, completeness=0.9, fabrication=0.0,
+        reasoning="ok", model_id="claude-haiku-4-5",
+    )
+    assert 0 <= s.faithfulness <= 1
