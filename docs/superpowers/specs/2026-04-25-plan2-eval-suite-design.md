@@ -468,12 +468,14 @@ Implementation: CloudWatch `MetricFilter` on the `judge.passed_int=0` log patter
 ```
 Budget: assessor-agent-monthly-bedrock
   Filter: service=AmazonBedrock, tag.project=assessor-agent
-  Thresholds:
-    50%  ($25) → SNS notification (info)
-    80%  ($120) → SNS notification (warn — email all stakeholders)
-   100%  ($150) → SNS notification (critical — investigate)
+  Notifications (absolute monthly thresholds, NOT % of cap):
+    actual >= $50  → SNS notification (info — early warning)
+    actual >= $150 → SNS notification (warn — at steady-state line; investigate sustained breach)
+    actual >= $250 → SNS notification (critical — well above expected; manual triage)
   No automatic shutoff (manual triage).
 ```
+
+Rationale for absolute thresholds (vs % of a single cap): the steady-state cost is ~$180/month per the executive summary, so a single "100% of $X" cap would either be too low (constant alarms) or too high (no early warning). Three absolute thresholds at $50/$150/$250 give early-warn + steady-state-line + escalation in one budget.
 
 ### 6.2 Bedrock invocation logging
 
