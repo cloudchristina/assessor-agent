@@ -1,9 +1,6 @@
 pydantic>=2.6
 aws-lambda-powertools>=3.0
 pymssql>=2.3
-strands-agents>=1.0
+strands-agents[otel]>=1.0
 reportlab>=4.0
 tenacity>=9.0
-# OTLP HTTP exporter sends Strands' OTel spans to the ADOT collector
-# sidecar (listening on localhost:4318). See src/shared/otel_init.py.
-opentelemetry-exporter-otlp-proto-http>=1.41
