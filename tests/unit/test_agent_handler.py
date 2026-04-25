@@ -26,10 +26,19 @@ def test_handler_writes_narrative_to_s3():
         Bucket="test-bucket-123",
         CreateBucketConfiguration={"LocationConstraint": "ap-southeast-2"},
     )
+    findings_doc = {"findings": [{
+        "finding_id": "F-1", "rule_id": "R1", "severity": "CRITICAL",
+        "principal": "alice", "databases": ["appdb"],
+        "ism_controls": ["ISM-1546"], "evidence": {},
+    }]}
+    s3.put_object(
+        Bucket="test-bucket-123",
+        Key="rules/run_x/findings.json",
+        Body=json.dumps(findings_doc).encode("utf-8"),
+    )
+
     fake_agent = MagicMock()
     fake_agent.structured_output.return_value = _fake_report()
-    fake_agent.input_tokens = 100
-    fake_agent.output_tokens = 50
 
     with patch("src.agent_narrator.handler._build_agent", return_value=fake_agent):
         from src.agent_narrator.handler import lambda_handler

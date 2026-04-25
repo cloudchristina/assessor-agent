@@ -255,7 +255,7 @@ resource "aws_iam_role_policy" "entity_grounding_gate" {
 data "aws_iam_policy_document" "judge" {
   statement {
     effect    = "Allow"
-    actions   = ["bedrock:InvokeModel"]
+    actions   = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
     resources = ["*"]
   }
   statement {
