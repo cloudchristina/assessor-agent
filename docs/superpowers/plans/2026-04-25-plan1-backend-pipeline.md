@@ -1639,7 +1639,7 @@ git commit -m "feat(rules): add rules-engine Lambda handler"
 - Create: `src/citation_gate/handler.py`
 - Create: `tests/unit/test_citation_gate.py`
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 ```python
 import json, boto3
@@ -1682,9 +1682,9 @@ def test_fails_when_narrative_invents_id():
     assert "F-FAKE" in out["missing_ids"]
 ```
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """C5 — citation gate. Every cited finding_id must exist in findings set."""
@@ -1716,9 +1716,9 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
             "missing_ids": missing, "extra_ids": extra}
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/citation_gate tests/unit/test_citation_gate.py
