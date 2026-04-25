@@ -1976,7 +1976,7 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
 - Create: `tests/unit/test_csv_codec.py`
 - Create: `tests/unit/test_csv_writer.py`
 
-- [ ] **Step 1: Failing tests for codec round-trip**
+- [x] **Step 1: Failing tests for codec round-trip**
 
 `tests/unit/test_csv_codec.py`:
 ```python
@@ -2007,9 +2007,9 @@ def test_round_trip_preserves_data():
     assert decoded["explicit_admin"] is True
 ```
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement codec**
+- [x] **Step 3: Implement codec**
 
 `src/extract_uar/csv_codec.py`:
 ```python
@@ -2069,9 +2069,9 @@ def decode_row(row: dict[str, str]) -> dict:
     return out
 ```
 
-- [ ] **Step 4: Codec test passes**
+- [x] **Step 4: Codec test passes**
 
-- [ ] **Step 5: Failing tests for `build_csv_and_manifest`**
+- [x] **Step 5: Failing tests for `build_csv_and_manifest`**
 
 ```python
 from src.extract_uar.csv_writer import build_csv_and_manifest
@@ -2090,11 +2090,11 @@ def test_hash_differs_on_extra_row():
     assert m1.row_ids_sha256 != m2.row_ids_sha256
 ```
 
-- [ ] **Step 6: Implement writer** — uses `encode_row`, csv.DictWriter, builds `ExtractManifest`. Hash = SHA-256 of `\n`-joined sorted `f"{login_name}||{database}"` strings. Returns `(csv_bytes: bytes, manifest: ExtractManifest)`.
+- [x] **Step 6: Implement writer** — uses `encode_row`, csv.DictWriter, builds `ExtractManifest`. Hash = SHA-256 of `\n`-joined sorted `f"{login_name}||{database}"` strings. Returns `(csv_bytes: bytes, manifest: ExtractManifest)`.
 
-- [ ] **Step 7: Codec + writer tests pass**
+- [x] **Step 7: Codec + writer tests pass**
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/extract_uar/csv_codec.py src/extract_uar/csv_writer.py \
