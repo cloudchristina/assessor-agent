@@ -71,6 +71,28 @@ def test_unreachable_server_fails_the_run(runs_bucket, sql_secret_arn, monkeypat
             )
 
 
+def test_synthetic_data_path_uses_fixture_file(runs_bucket, monkeypatch, tmp_path):
+    """The demo path: upload the checked-in synthetic fixture to S3 and run
+    the extractor against it. Ten rows cover R1–R6 firing scenarios."""
+    from pathlib import Path
+
+    fixture = Path(__file__).resolve().parents[1] / "fixtures" / "synthetic_uar_minimal.csv"
+    uri = _put_fixture(runs_bucket, "fixtures/synth.csv", fixture.read_bytes())
+    monkeypatch.setenv("SYNTHETIC_DATA_S3_URI", uri)
+
+    result = h.lambda_handler(
+        {"cadence": "weekly", "started_at": "2026-04-25T09:00:00+10:00"},
+        None,
+    )
+
+    s3 = boto3.client("s3", region_name="ap-southeast-2")
+    manifest = json.loads(
+        s3.get_object(Bucket=runs_bucket, Key="raw/dt=2026-04-25/cadence=weekly/manifest.json")["Body"].read()
+    )
+    assert manifest["row_count"] == 10
+    assert result["run_id"] == "run_2026-04-25_weekly"
+
+
 def test_live_path_happy_case_with_mocked_pymssql(runs_bucket, sql_secret_arn, monkeypatch):
     """One server, one DB, one mapped login returning a single admin row."""
     monkeypatch.delenv("SYNTHETIC_DATA_S3_URI", raising=False)

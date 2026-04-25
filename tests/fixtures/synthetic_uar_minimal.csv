@@ -1,0 +1,11 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+alice_sqladmin,SQL_LOGIN,2024-01-01 00:00:00,2026-04-01 09:00:00,sysadmin,appdb (s1),alice,SQL_USER,dbo,db_owner,False,False,False,False,Admin,,
+bob_dormant,WINDOWS_LOGIN,2020-06-15 00:00:00,2025-12-10 00:00:00,,appdb (s1),bob,USER,dbo,db_owner,False,False,False,False,Admin,,
+carol_dev,WINDOWS_LOGIN,2024-03-10 00:00:00,2026-04-20 12:00:00,,appdb_dev (s1),carol,USER,dbo,db_owner,False,False,False,False,Admin,,
+carol_prod,WINDOWS_LOGIN,2024-03-10 00:00:00,2026-04-20 12:00:00,,appdb_prod (s1),carol,USER,dbo,db_owner,False,False,False,False,Admin,,
+dave_orphan,SQL_LOGIN,2025-08-01 00:00:00,,,appdb (s1),,,,,False,False,False,False,Unknown,,
+eve_explicit,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-24 08:00:00,,appdb (s1),eve,USER,dbo,,False,True,False,False,Write,UPDATE=1,
+admin,WINDOWS_LOGIN,2023-01-01 00:00:00,2026-04-01 10:00:00,,appdb (s1),admin_user,USER,dbo,db_datareader,True,False,False,False,ReadOnly,SELECT=5,
+svc_etl,SQL_LOGIN,2024-01-01 00:00:00,2026-04-20 03:00:00,,appdb (s1),svc_etl,SQL_USER,dbo,db_datareader,True,False,False,False,ReadOnly,SELECT=10,
+user42,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-15 09:00:00,,appdb (s1),user42,USER,dbo,db_datareader,True,False,False,False,ReadOnly,SELECT=3,
+alice.smith,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-22 09:00:00,,appdb (s1),alice.smith,USER,dbo,db_datareader,True,False,False,False,ReadOnly,SELECT=1,

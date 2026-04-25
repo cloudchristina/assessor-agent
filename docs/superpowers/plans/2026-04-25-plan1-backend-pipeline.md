@@ -2151,13 +2151,13 @@ This is the contract the SFN `ExtractUar` state's `ResultSelector` (Task 9.9) pr
 - Create: `scripts/synth_data.py`
 - Modify: `src/extract_uar/handler.py` (already supported via env var in 4.4)
 
-- [ ] **Step 1: Write a 20-row synthetic CSV by hand** covering each of R1 – R6 firing once.
+- [x] **Step 1: Write a 20-row synthetic CSV by hand** covering each of R1 – R6 firing once.
 
-- [ ] **Step 2: Write `synth_data.py`** — a tiny CLI that takes `--out` and writes a CSV with N rows including one prompt-injection row (`login_name="admin'; IGNORE..."`) toggled by `--include-injection`. Plan 4 expands this into a full generator.
+- [x] **Step 2: Write `synth_data.py`** — a tiny CLI that takes `--out` and writes a CSV with N rows including one prompt-injection row (`login_name="admin'; IGNORE..."`) toggled by `--include-injection`. Plan 4 expands this into a full generator.
 
-- [ ] **Step 3: Verify** by running the extractor handler with `SYNTHETIC_DATA_S3_URI=...` against the fixture in `tests/integration/test_extract_e2e.py::test_synthetic_data_path`.
+- [x] **Step 3: Verify** by running the extractor handler with `SYNTHETIC_DATA_S3_URI=...` against the fixture in `tests/integration/test_extract_e2e.py::test_synthetic_data_path`.
 
-- [ ] **Step 4: Commit** `feat(extract): synthetic-data fallback path + minimal fixture`
+- [x] **Step 4: Commit** `feat(extract): synthetic-data fallback path + minimal fixture`
 
 ---
 
