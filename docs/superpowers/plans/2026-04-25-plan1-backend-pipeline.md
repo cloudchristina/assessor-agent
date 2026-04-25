@@ -1421,7 +1421,7 @@ git commit -m "feat(rules): add R2 dormant privileged account (ISM-1509/1555)"
 5. Same login `db_owner` role in dev + prod (access_level might be "Write" but role granular) → fires.
 6. Edge: ambiguous DB name without env tag → does not fire (no false positives on uncategorisable).
 
-- [ ] **Steps 1 – 5:** Write failing tests, run, implement (using `_classify_env(database) -> Literal["dev","prod","uat","other"]`), pass, commit:
+- [x] **Steps 1 – 5:** Write failing tests, run, implement (using `_classify_env(database) -> Literal["dev","prod","uat","other"]`), pass, commit:
 
 ```bash
 git commit -m "feat(rules): add R3 SoD breach across dev+prod environments (ISM-1175)"
