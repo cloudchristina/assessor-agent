@@ -1007,7 +1007,7 @@ git commit -m "feat(shared): add ISM control catalogue with 9 controls"
 - Create: `src/shared/logging.py`
 - Create: `tests/unit/test_logging.py`
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 ```python
 import json, logging
@@ -1024,9 +1024,9 @@ def test_logger_emits_json(capsys):
     assert obj["message"] == "hello"
 ```
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """Structured-JSON logger backed by aws-lambda-powertools."""
@@ -1037,9 +1037,9 @@ def get_logger(service: str) -> Logger:
     return Logger(service=service, level="INFO", use_rfc3339=True)
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/shared/logging.py tests/unit/test_logging.py
