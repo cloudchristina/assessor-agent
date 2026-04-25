@@ -1,0 +1,36 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install uv
+      - run: uv pip install --system -e ".[dev]"
+      - run: ruff check src tests
+      - run: ruff format --check src tests
+      - run: pyright
+      - run: bandit -r src
+      - run: pip-audit
+      - run: pytest tests/unit -v
+
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.5"
+      - run: cd infra/terraform && terraform fmt -check -recursive
+      - run: cd infra/terraform && terraform init -backend=false
+      - run: cd infra/terraform && terraform validate
+      - uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: infra/terraform

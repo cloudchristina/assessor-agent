@@ -508,7 +508,7 @@ git commit -m "chore: scaffold terraform with versions, providers, locals"
 **Files:**
 - Create: `.github/workflows/ci.yml`
 
-- [ ] **Step 1: Write CI workflow**
+- [x] **Step 1: Write CI workflow**
 
 ```yaml
 name: ci
@@ -549,7 +549,7 @@ jobs:
           working_directory: infra/terraform
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add .github/workflows/ci.yml
