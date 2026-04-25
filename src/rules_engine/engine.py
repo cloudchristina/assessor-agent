@@ -7,7 +7,8 @@ from src.rules_engine.rules.base import Rule, RuleContext
 
 
 def run_rules(rows: list[UARRow], run_id: str, rules: list[Rule]) -> RulesEngineOutput:
-    ctx = RuleContext(run_id=run_id, now=datetime.now(timezone.utc))
+    # Naive UTC so comparisons against UARRow datetimes (also naive) don't raise.
+    ctx = RuleContext(run_id=run_id, now=datetime.now(timezone.utc).replace(tzinfo=None))
     all_findings: list[Finding] = []
     for r in rules:
         raw = r.evaluate(rows, ctx)

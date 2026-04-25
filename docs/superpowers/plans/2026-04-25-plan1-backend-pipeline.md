@@ -1498,7 +1498,7 @@ git commit -m "feat(rules): add R6 shared/generic account (ISM-1545)"
 - Modify: `src/rules_engine/rules/__init__.py`
 - Modify: `tests/unit/test_rules_engine.py`
 
-- [ ] **Step 1: Failing integration test**
+- [x] **Step 1: Failing integration test**
 
 ```python
 from src.rules_engine.rules import RULES
@@ -1517,9 +1517,9 @@ def test_engine_runs_all_six_rules_on_synthetic_dataset():
     assert len({f.finding_id for f in out.findings}) == len(out.findings)
 ```
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement** — `src/rules_engine/rules/__init__.py`:
+- [x] **Step 3: Implement** — `src/rules_engine/rules/__init__.py`:
 
 ```python
 from src.rules_engine.rules.r1_sql_login_admin import R1SqlLoginAdmin
@@ -1539,9 +1539,9 @@ RULES = [
 ]
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git commit -am "feat(rules): wire all six rules into RULES registry"
