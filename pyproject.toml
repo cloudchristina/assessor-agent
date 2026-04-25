@@ -23,6 +23,11 @@ dev = [
     "bandit>=1.7",
     "pip-audit>=2.7",
     "pre-commit>=3.7",
+    # Plan 2 eval harness:
+    "ragas>=0.2",
+    "bert-score>=0.3.13",
+    "scipy>=1.13",
+    "datasets>=2.20",       # ragas dependency for evaluator inputs
 ]
 
 [build-system]
