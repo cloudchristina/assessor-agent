@@ -1754,7 +1754,7 @@ Commit: `feat(gates): add reconciliation-gate Lambda (C6) with passed_int`
 - Create: `src/entity_grounding_gate/entity_extraction.py`
 - Create: `tests/unit/test_entity_grounding.py`
 
-- [ ] **Step 1: Failing tests for entity extraction**
+- [x] **Step 1: Failing tests for entity extraction**
 
 ```python
 from src.entity_grounding_gate.entity_extraction import extract_entities
@@ -1778,9 +1778,9 @@ def test_handles_empty_narrative():
                  "dates": set(), "numbers": set()}
 ```
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """Lightweight entity extraction via regex. Tuned for our narrative shape, not NER-grade."""
@@ -1807,9 +1807,9 @@ def extract_entities(text: str) -> dict[str, set]:
     }
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(gates): add entity-extraction helper for grounding gate`
+- [x] **Step 5: Commit** `feat(gates): add entity-extraction helper for grounding gate`
 
 ---
 
