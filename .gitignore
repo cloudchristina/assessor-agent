@@ -22,3 +22,4 @@ infra/terraform/tfplan
 infra/terraform/modules/*/builds/
 infra/terraform/modules/*/.build/
 .DS_Store
+.claude/
