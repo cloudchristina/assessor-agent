@@ -1555,7 +1555,7 @@ git commit -am "feat(rules): wire all six rules into RULES registry"
 - Create: `src/rules_engine/handler.py`
 - Create: `tests/unit/test_rules_engine_handler.py`
 
-- [ ] **Step 1: Failing test** (handler reads validated rows JSON from S3, writes findings.json to S3, returns state payload)
+- [x] **Step 1: Failing test** (handler reads validated rows JSON from S3, writes findings.json to S3, returns state payload)
 
 ```python
 import json
@@ -1575,9 +1575,9 @@ def test_handler_writes_findings_json():
     assert result["summary"]["R1"] == 0
 ```
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """Lambda: read validated rows from S3, run all rules, write findings.json."""
@@ -1619,9 +1619,9 @@ def lambda_handler(event: dict, _context: object) -> dict:
     }
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/rules_engine/handler.py tests/unit/test_rules_engine_handler.py
