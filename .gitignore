@@ -17,4 +17,8 @@ dist/
 .terraform.lock.hcl
 *.tfstate
 *.tfstate.backup
+infra/terraform/builds/
+infra/terraform/tfplan
+infra/terraform/modules/*/builds/
+infra/terraform/modules/*/.build/
 .DS_Store

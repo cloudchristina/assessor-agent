@@ -1,1 +1,0 @@
-{"filename": "builds/8febc4ef412a6c6f1cd9159ff4aed9a726c67f93a7a9fd543e7acf1ba693edfb.zip", "runtime": "", "artifacts_dir": "builds", "build_plan": [[["zip", "../../src/agent_narrator", ""]], [["zip", "../../src/shared", "shared"]]]}

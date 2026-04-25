@@ -1,1 +1,0 @@
-{"filename": "builds/29e3428c2485b9c041600d5c3d9c93184001433420a8c558662234d5014cc26f.zip", "runtime": "", "artifacts_dir": "builds", "build_plan": [[["zip", "../../src/rules_engine", ""]], [["zip", "../../src/shared", "shared"]]]}

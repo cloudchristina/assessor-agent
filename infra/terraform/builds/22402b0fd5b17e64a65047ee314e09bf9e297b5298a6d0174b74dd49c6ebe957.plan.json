@@ -1,1 +1,0 @@
-{"filename": "builds/22402b0fd5b17e64a65047ee314e09bf9e297b5298a6d0174b74dd49c6ebe957.zip", "runtime": "", "artifacts_dir": "builds", "build_plan": [[["zip", "../../src/entity_grounding_gate", ""]], [["zip", "../../src/shared", "shared"]]]}

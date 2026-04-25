@@ -1,1 +1,0 @@
-{"filename": "builds/6c5fbe68128d7207e722c63bfdec7f44b52345af256ac17077166847f9080374.zip", "runtime": "", "artifacts_dir": "builds", "build_plan": [[["zip", "../../src/judge", ""]], [["zip", "../../src/shared", "shared"]]]}
