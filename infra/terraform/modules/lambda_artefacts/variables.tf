@@ -1,16 +1,30 @@
+variable "name_prefix" {
+  type        = string
+  description = "Prefix used for function + DLQ naming, e.g. assessor-agent-dev."
+}
+
 variable "deploy_bucket" {
   type        = string
-  description = "S3 bucket where Lambda zips will be uploaded."
+  description = "S3 bucket where Lambda zips are uploaded."
 }
 
 variable "src_root" {
   type        = string
-  description = "Absolute path to repo's src/ directory."
+  description = "Absolute path to the repo's src/ directory — ships under a `src/` prefix inside each zip so handler imports like `from src.shared.models import UARRow` resolve."
+}
+
+variable "requirements_path" {
+  type        = string
+  description = "Absolute path to a requirements.txt listing runtime deps (pydantic, pymssql, strands-agents, ...). boto3 is provided by the Lambda runtime and MUST NOT be listed."
 }
 
 variable "lambdas" {
-  type = list(object({
-    name        = string
-    handler_dir = string
+  type = map(object({
+    handler  = string
+    role_arn = string
+    env      = map(string)
+    memory   = number
+    timeout  = number
   }))
+  description = "Keyed by logical lambda name (snake_case). env is passed through to Lambda config."
 }

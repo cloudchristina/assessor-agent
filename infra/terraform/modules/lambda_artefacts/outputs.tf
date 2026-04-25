@@ -1,10 +1,12 @@
-output "artefacts" {
-  description = "Map keyed by lambda name to {bucket, key, sha256}"
-  value = {
-    for name, m in module.package : name => {
-      bucket = m.s3_object.bucket
-      key    = m.s3_object.key
-      sha256 = filebase64sha256(m.local_filename)
-    }
-  }
+output "function_arns" {
+  description = "Logical lambda name -> Lambda function ARN."
+  value       = { for k, m in module.fn : k => m.lambda_function_arn }
+}
+
+output "function_names" {
+  value = { for k, m in module.fn : k => m.lambda_function_name }
+}
+
+output "dlq_arns" {
+  value = { for k, q in aws_sqs_queue.dlq : k => q.arn }
 }

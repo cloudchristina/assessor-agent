@@ -1,0 +1,6 @@
+pydantic>=2.6
+aws-lambda-powertools>=3.0
+pymssql>=2.3
+strands-agents>=1.0
+reportlab>=4.0
+tenacity>=9.0

@@ -7,7 +7,7 @@ resource "aws_bedrock_guardrail" "this" {
   content_policy_config {
     filters_config {
       input_strength  = "HIGH"
-      output_strength = "HIGH"
+      output_strength = "NONE" # Bedrock API restriction: PROMPT_ATTACK applies on input only.
       type            = "PROMPT_ATTACK"
     }
   }

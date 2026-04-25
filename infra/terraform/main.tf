@@ -3,48 +3,69 @@
 # Dependency order:
 #   kms -> s3_buckets, dynamodb, secrets -> iam_roles
 #                                         -> bedrock_guardrail
-#                                         -> lambda_artefacts
-#                                         -> lambda_function (x10)
+#                                         -> lambda_artefacts (packages + creates 10 fns)
 #                                         -> step_functions
 #                                         -> eventbridge
-#
-# KMS-IAM circular dependency: the Lambda execution roles must appear as
-# principals in the KMS key policies. We resolve this by:
-#   1. Creating the KMS module with only account-root principals first.
-#   2. Creating the iam_roles module (which needs the KMS ARNs) once those
-#      keys exist.
-#   3. Re-applying the KMS key policies via a follow-up
-#      aws_kms_key_policy resource here in main.tf, after iam_roles has
-#      produced role ARNs.
 
 locals {
-  lambda_defs = [
-    { name = "extract_uar", handler_dir = "extract_uar" },
-    { name = "validate_and_hash", handler_dir = "validate_and_hash" },
-    { name = "rules_engine", handler_dir = "rules_engine" },
-    { name = "agent_narrator", handler_dir = "agent_narrator" },
-    { name = "citation_gate", handler_dir = "citation_gate" },
-    { name = "reconciliation_gate", handler_dir = "reconciliation_gate" },
-    { name = "entity_grounding_gate", handler_dir = "entity_grounding_gate" },
-    { name = "judge", handler_dir = "judge" },
-    { name = "publish_triage", handler_dir = "publish_triage" },
-    { name = "generate_pdf", handler_dir = "generate_pdf" },
-  ]
+  src_root          = "${path.module}/../../src"
+  requirements_path = "${path.module}/lambda-requirements.txt"
 
-  handler_entry = {
-    extract_uar           = "extract_uar.handler.lambda_handler"
-    validate_and_hash     = "validate_and_hash.handler.lambda_handler"
-    rules_engine          = "rules_engine.handler.lambda_handler"
-    agent_narrator        = "agent_narrator.handler.lambda_handler"
-    citation_gate         = "citation_gate.handler.lambda_handler"
-    reconciliation_gate   = "reconciliation_gate.handler.lambda_handler"
-    entity_grounding_gate = "entity_grounding_gate.handler.lambda_handler"
-    judge                 = "judge.handler.lambda_handler"
-    publish_triage        = "publish_triage.handler.lambda_handler"
-    generate_pdf          = "generate_pdf.handler.lambda_handler"
+  # One source-of-truth map keyed by logical (snake_case) lambda name.
+  # handler entries use src.<dir>.handler.lambda_handler because the
+  # packaging step puts everything under a `src/` prefix in the zip.
+  lambda_specs = {
+    extract_uar = {
+      handler = "src.extract_uar.handler.lambda_handler"
+      memory  = 1024
+      timeout = 120
+    }
+    validate_and_hash = {
+      handler = "src.validate_and_hash.handler.lambda_handler"
+      memory  = 1024
+      timeout = 60
+    }
+    rules_engine = {
+      handler = "src.rules_engine.handler.lambda_handler"
+      memory  = 1024
+      timeout = 60
+    }
+    agent_narrator = {
+      handler = "src.agent_narrator.handler.lambda_handler"
+      memory  = 1024
+      timeout = 300
+    }
+    citation_gate = {
+      handler = "src.citation_gate.handler.lambda_handler"
+      memory  = 512
+      timeout = 30
+    }
+    reconciliation_gate = {
+      handler = "src.reconciliation_gate.handler.lambda_handler"
+      memory  = 512
+      timeout = 30
+    }
+    entity_grounding_gate = {
+      handler = "src.entity_grounding_gate.handler.lambda_handler"
+      memory  = 512
+      timeout = 30
+    }
+    judge = {
+      handler = "src.judge.handler.lambda_handler"
+      memory  = 1024
+      timeout = 120
+    }
+    publish_triage = {
+      handler = "src.publish_triage.handler.lambda_handler"
+      memory  = 1024
+      timeout = 60
+    }
+    generate_pdf = {
+      handler = "src.generate_pdf.handler.lambda_handler"
+      memory  = 1024
+      timeout = 60
+    }
   }
-
-  src_root = "${path.module}/../../src"
 }
 
 module "kms" {
@@ -92,40 +113,38 @@ module "iam_roles" {
 }
 
 module "lambda_artefacts" {
-  source        = "./modules/lambda_artefacts"
-  deploy_bucket = module.s3_buckets.runs_bucket_name
-  src_root      = local.src_root
-  lambdas       = local.lambda_defs
-}
+  source            = "./modules/lambda_artefacts"
+  name_prefix       = local.name_prefix
+  deploy_bucket     = module.s3_buckets.runs_bucket_name
+  src_root          = local.src_root
+  requirements_path = local.requirements_path
 
-module "lambda_function" {
-  source           = "./modules/lambda_function"
-  for_each         = toset([for d in local.lambda_defs : d.name])
-  name             = "${local.name_prefix}-${replace(each.key, "_", "-")}"
-  name_prefix      = local.name_prefix
-  handler          = local.handler_entry[each.key]
-  source_s3_bucket = module.lambda_artefacts.artefacts[each.key].bucket
-  source_s3_key    = module.lambda_artefacts.artefacts[each.key].key
-  source_code_hash = module.lambda_artefacts.artefacts[each.key].sha256
-  role_arn         = module.iam_roles.lambda_role_arns[each.key]
-  env = merge(
-    {
-      POWERTOOLS_SERVICE_NAME = each.key
-      RUNS_BUCKET             = module.s3_buckets.runs_bucket_name
-    },
-    each.key == "extract_uar" ? {
-      SECRETS_MANAGER_ARNS = jsonencode(module.secrets.secret_arns)
-    } : {},
-    contains(["agent_narrator", "publish_triage"], each.key) ? {
-      FINDINGS_TABLE = module.dynamodb.findings_table_name
-    } : {},
-    each.key == "publish_triage" ? {
-      RUNS_TABLE = module.dynamodb.runs_table_name
-    } : {},
-    each.key == "agent_narrator" ? {
-      BEDROCK_GUARDRAIL_ID = module.bedrock_guardrail.guardrail_id
-    } : {},
-  )
+  lambdas = {
+    for k, spec in local.lambda_specs : k => {
+      handler  = spec.handler
+      role_arn = module.iam_roles.lambda_role_arns[k]
+      memory   = spec.memory
+      timeout  = spec.timeout
+      env = merge(
+        {
+          POWERTOOLS_SERVICE_NAME = k
+          RUNS_BUCKET             = module.s3_buckets.runs_bucket_name
+        },
+        k == "extract_uar" ? {
+          SECRETS_MANAGER_ARNS = jsonencode(module.secrets.secret_arns)
+        } : {},
+        contains(["agent_narrator", "publish_triage"], k) ? {
+          FINDINGS_TABLE = module.dynamodb.findings_table_name
+        } : {},
+        k == "publish_triage" ? {
+          RUNS_TABLE = module.dynamodb.runs_table_name
+        } : {},
+        k == "agent_narrator" ? {
+          BEDROCK_GUARDRAIL_ID = module.bedrock_guardrail.guardrail_id
+        } : {},
+      )
+    }
+  }
 }
 
 module "step_functions" {
@@ -133,7 +152,7 @@ module "step_functions" {
   name_prefix     = local.name_prefix
   role_arn        = module.iam_roles.step_functions_role_arn
   definition_path = "${path.module}/../step_functions/pipeline.asl.json"
-  lambda_arns     = { for k, m in module.lambda_function : k => m.function_arn }
+  lambda_arns     = module.lambda_artefacts.function_arns
 }
 
 module "eventbridge" {

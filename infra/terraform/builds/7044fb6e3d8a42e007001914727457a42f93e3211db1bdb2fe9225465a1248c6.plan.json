@@ -1,0 +1,1 @@
+{"filename": "builds/7044fb6e3d8a42e007001914727457a42f93e3211db1bdb2fe9225465a1248c6.zip", "runtime": "", "artifacts_dir": "builds", "build_plan": [[["zip", "../../src/generate_pdf", ""]], [["zip", "../../src/shared", "shared"]]]}

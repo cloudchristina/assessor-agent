@@ -70,6 +70,13 @@ data "aws_iam_policy_document" "base" {
     ]
     resources = ["*"]
   }
+  # Lambda's CreateFunction validates that the role can SendMessage on its
+  # configured DLQ. The DLQ name follows the pattern <name_prefix>-<fn>-dlq.
+  statement {
+    effect    = "Allow"
+    actions   = ["sqs:SendMessage"]
+    resources = ["arn:aws:sqs:*:*:${var.name_prefix}-*-dlq"]
+  }
 }
 
 resource "aws_iam_role" "lambda" {

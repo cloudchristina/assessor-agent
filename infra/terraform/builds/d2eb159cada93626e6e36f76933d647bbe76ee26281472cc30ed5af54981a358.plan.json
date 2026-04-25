@@ -1,0 +1,1 @@
+{"filename": "builds/d2eb159cada93626e6e36f76933d647bbe76ee26281472cc30ed5af54981a358.zip", "runtime": "", "artifacts_dir": "builds", "build_plan": [[["zip", "../../src/citation_gate", ""]], [["zip", "../../src/shared", "shared"]]]}
