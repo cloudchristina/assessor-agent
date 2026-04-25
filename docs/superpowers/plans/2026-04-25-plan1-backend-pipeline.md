@@ -378,7 +378,7 @@ git commit -m "chore: scaffold project tooling (ruff, pyright, pre-commit, Makef
 - Create: `infra/terraform/main.tf`
 - Create: `infra/terraform/envs/dev.tfvars`
 
-- [ ] **Step 1: Write versions.tf**
+- [x] **Step 1: Write versions.tf**
 
 ```hcl
 terraform {
@@ -392,7 +392,7 @@ terraform {
 }
 ```
 
-- [ ] **Step 2: Write providers.tf**
+- [x] **Step 2: Write providers.tf**
 
 ```hcl
 provider "aws" {
@@ -403,7 +403,7 @@ provider "aws" {
 }
 ```
 
-- [ ] **Step 3: Write backend.tf**
+- [x] **Step 3: Write backend.tf**
 
 ```hcl
 terraform {
@@ -414,7 +414,7 @@ terraform {
 }
 ```
 
-- [ ] **Step 4: Write locals.tf**
+- [x] **Step 4: Write locals.tf**
 
 ```hcl
 locals {
@@ -429,14 +429,14 @@ locals {
 }
 ```
 
-- [ ] **Step 5: Write data.tf**
+- [x] **Step 5: Write data.tf**
 
 ```hcl
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 ```
 
-- [ ] **Step 6: Write variables.tf**
+- [x] **Step 6: Write variables.tf**
 
 ```hcl
 variable "region" {
@@ -466,7 +466,7 @@ variable "monthly_cron" {
 }
 ```
 
-- [ ] **Step 7: Write outputs.tf and main.tf placeholders**
+- [x] **Step 7: Write outputs.tf and main.tf placeholders**
 
 `main.tf`:
 ```hcl
@@ -478,14 +478,14 @@ variable "monthly_cron" {
 output "name_prefix" { value = local.name_prefix }
 ```
 
-- [ ] **Step 8: Write envs/dev.tfvars**
+- [x] **Step 8: Write envs/dev.tfvars**
 
 ```hcl
 environment = "dev"
 owner_email = "REPLACE_ME@example.com"
 ```
 
-- [ ] **Step 9: Verify terraform init + validate**
+- [x] **Step 9: Verify terraform init + validate**
 
 ```bash
 cd infra/terraform
@@ -494,7 +494,7 @@ terraform validate
 ```
 Expected: `Success! The configuration is valid.`
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add infra/terraform
