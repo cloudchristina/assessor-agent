@@ -26,7 +26,7 @@ try:
     from opentelemetry import trace as _trace_api
     from opentelemetry.sdk.resources import Resource
     from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor
     from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 except ImportError:
     # OTLP exporter not installed (e.g. local pytest env without lambda
@@ -35,13 +35,18 @@ except ImportError:
     _trace_api = None  # type: ignore[assignment]
 
 
+_provider = None  # module-level so flush_otel() can reach it
+
+
 def _init() -> None:
+    global _provider
     if _trace_api is None:
         return
     # Idempotency guard — Lambda may import the handler module multiple times
     # in some warm-start paths.
     existing = _trace_api.get_tracer_provider()
     if isinstance(existing, TracerProvider):
+        _provider = existing
         return
 
     endpoint = os.environ.get(
@@ -59,9 +64,24 @@ def _init() -> None:
         "service.namespace": "assessor-agent",
         "deployment.environment": os.environ.get("ENVIRONMENT", "dev"),
     })
+    # SimpleSpanProcessor (NOT Batch) — Lambda freezes the runtime between
+    # invocations, so async batching loses spans. Simple is synchronous and
+    # works correctly with Lambda's lifecycle.
     provider = TracerProvider(resource=resource)
-    provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint)))
+    provider.add_span_processor(SimpleSpanProcessor(OTLPSpanExporter(endpoint=endpoint)))
     _trace_api.set_tracer_provider(provider)
+    _provider = provider
+
+
+def flush_otel() -> None:
+    """Best-effort flush. SimpleSpanProcessor exports synchronously so this is
+    usually a no-op, but force_flush is cheap insurance and matters if a
+    BatchSpanProcessor is ever swapped in. Call before Lambda handler returns."""
+    if _provider is not None and hasattr(_provider, "force_flush"):
+        try:
+            _provider.force_flush(timeout_millis=5000)
+        except Exception:  # pragma: no cover - defensive
+            pass
 
 
 _init()

@@ -52,6 +52,7 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
     score: JudgeScore = result.structured_output
     passed = _passed(score)
     log.info("judge.done", extra={"passed": passed, **score.model_dump(exclude={"reasoning"})})
+    src.shared.otel_init.flush_otel()
     return {
         "gate": "judge",
         "passed": passed,

@@ -92,6 +92,7 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
             "findings_count": len(event["finding_ids"]),
         },
     )
+    src.shared.otel_init.flush_otel()
     return {
         "run_id": run_id,
         "narrative_s3_uri": f"s3://{bucket}/{out_key}",
