@@ -2372,11 +2372,11 @@ def build_user_prompt(run_id: str, summary: dict[str, int], finding_ids: list[st
 - Create: `src/agent_narrator/handler.py`
 - Create: `tests/unit/test_agent_handler.py`
 
-- [ ] **Step 1: Failing test** (mock `strands.Agent` to return a fixed `NarrativeReport` object; assert handler writes it to S3 and returns the URI)
+- [x] **Step 1: Failing test** (mock `strands.Agent` to return a fixed `NarrativeReport` object; assert handler writes it to S3 and returns the URI)
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """C4 — Strands agent narrator. Receives summary+IDs, writes NarrativeReport to S3."""
@@ -2444,9 +2444,9 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
 
 > **Implementation note:** Strands SDK API surface (`Agent`, `BedrockModel`, `structured_output`, `@tool`) is current at the time of writing — verify against the installed version before implementing; rename if the SDK has moved on.
 
-- [ ] **Step 4: Passes** (with mocked Agent)
+- [x] **Step 4: Passes** (with mocked Agent)
 
-- [ ] **Step 5: Commit** `feat(agent): add agent-narrator Lambda with structured output`
+- [x] **Step 5: Commit** `feat(agent): add agent-narrator Lambda with structured output`
 
 ---
 
