@@ -19,6 +19,13 @@ def _fake_report() -> NarrativeReport:
     )
 
 
+def _fake_agent_result() -> MagicMock:
+    """Mimic strands.AgentResult — only the attribute we use."""
+    res = MagicMock()
+    res.structured_output = _fake_report()
+    return res
+
+
 @mock_aws
 def test_handler_writes_narrative_to_s3():
     s3 = boto3.client("s3", region_name="ap-southeast-2")
@@ -37,8 +44,9 @@ def test_handler_writes_narrative_to_s3():
         Body=json.dumps(findings_doc).encode("utf-8"),
     )
 
-    fake_agent = MagicMock()
-    fake_agent.structured_output.return_value = _fake_report()
+    # Modern Strands API: agent(prompt, structured_output_model=Model) returns
+    # AgentResult with .structured_output populated. Tool-use loop runs in __call__.
+    fake_agent = MagicMock(return_value=_fake_agent_result())
 
     with patch("src.agent_narrator.handler._build_agent", return_value=fake_agent):
         from src.agent_narrator.handler import lambda_handler
@@ -53,7 +61,41 @@ def test_handler_writes_narrative_to_s3():
     assert result["model_id"] == "claude-sonnet-4-6"
     assert result["narrative_s3_uri"] == "s3://test-bucket-123/narratives/run_x/narrative.json"
 
+    # Critical: handler MUST call agent(...) with structured_output_model, not
+    # the deprecated agent.structured_output(...) method.
+    fake_agent.assert_called_once()
+    call_kwargs = fake_agent.call_args.kwargs
+    assert call_kwargs.get("structured_output_model") is NarrativeReport, (
+        "handler must use modern Strands API: agent(prompt, structured_output_model=...)"
+    )
+
     body = s3.get_object(Bucket="test-bucket-123", Key="narratives/run_x/narrative.json")["Body"].read()
     data = json.loads(body)
     assert data["total_findings"] == 1
     assert data["executive_summary"].startswith("One critical")
+
+
+def test_build_agent_registers_all_four_tools():
+    """Tools must be wired into the Agent so the model can invoke them."""
+    from src.agent_narrator import handler as h
+    from src.agent_narrator.tools import (
+        get_finding, get_ism_control, get_rule_spec, get_prior_cycle_summary,
+    )
+    expected_tools = {get_finding, get_ism_control, get_rule_spec, get_prior_cycle_summary}
+
+    # Patch Agent constructor to capture what tools are passed
+    captured: dict = {}
+
+    class _AgentSpy:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+    with patch("src.agent_narrator.handler.Agent", _AgentSpy), \
+         patch("src.agent_narrator.handler.BedrockModel", MagicMock()):
+        h._build_agent()
+
+    tools_passed = set(captured.get("tools") or [])
+    assert tools_passed == expected_tools, (
+        f"Agent must be built with all four tools registered. "
+        f"Got: {tools_passed}, expected: {expected_tools}"
+    )

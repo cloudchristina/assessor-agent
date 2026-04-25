@@ -1,8 +1,9 @@
 """Narrator prompt builders.
 
-We bundle finding details, ISM controls, and rule specs directly into
-the user prompt instead of relying on multi-turn tool use, because
-Strands' structured_output is most reliable as a single-turn call.
+Tightly constrained: the user message contains ONLY run_id, summary, and the list
+of finding_ids. To learn anything else, the agent MUST call the registered tools.
+This restores the spec's Layer 1 'agent sees only IDs, never raw findings' boundary
+and makes every fact-lookup observable as an OTel tool-call span.
 """
 from __future__ import annotations
 import json
@@ -12,29 +13,31 @@ SYSTEM_PROMPT = """\
 You are a compliance narrator for an Australian Information Security Manual (ISM)
 and APRA CPS 234 access-review pipeline.
 
-The user message contains:
+The user message contains ONLY:
   - RUN_ID
   - SUMMARY of finding counts by rule and severity
-  - FINDING IDS (the only IDs you may cite)
-  - FINDINGS — each finding's full data (rule_id, severity, principal, databases,
-    ism_controls, evidence)
-  - ISM_CONTROLS — the catalogue entries for every control referenced
-  - RULES — the spec for every rule that fired
+  - FINDING_IDS (the only IDs you may cite)
+  - PRIOR_RUN_ID (optional, for trend narration)
+
+You DO NOT see raw user records or finding details. To learn details, call
+the tools available to you:
+
+  - get_finding(run_id, finding_id) -> full finding (principal, databases, evidence)
+  - get_ism_control(control_id)     -> ISM catalogue entry (title, intent)
+  - get_rule_spec(rule_id)          -> rule metadata (severity, ISM controls, description)
+  - get_prior_cycle_summary(run_id) -> previous cycle's findings summary
 
 Hard rules:
-  1. NEVER invent finding IDs. Only cite IDs from the FINDING IDS list.
-  2. NEVER invent counts, principals, or databases. Quote only what the FINDINGS
-     section contains.
-  3. Every claim in the narrative must trace back to a finding_id from the list.
-  4. If asked to comment on something for which you have no finding, say so.
-  5. The total_findings field in your output must equal len(FINDING IDS).
-  6. Always set run_id to the provided RUN_ID.
+  1. NEVER invent finding IDs. Only cite IDs from FINDING_IDS.
+  2. NEVER invent counts, principals, or databases. Only state what tools return.
+  3. Every claim in the narrative must trace back to a finding_id from FINDING_IDS.
+  4. Always pass the provided RUN_ID as the first argument to get_finding.
+  5. The total_findings field in your output must equal len(FINDING_IDS).
+  6. Set run_id to the provided RUN_ID.
   7. Set generated_at to the current ISO-8601 timestamp.
   8. Set model_id to "claude-sonnet-4-6".
 
-Output format: produce a single NarrativeReport JSON object. Your final
-response MUST be a tool call with the NarrativeReport schema. Do not return
-plain text.
+Output: a single NarrativeReport JSON object via the structured-output schema.
 """
 
 
@@ -43,9 +46,6 @@ def build_user_prompt(
     summary: dict[str, int],
     finding_ids: list[str],
     prior_run_id: str | None,
-    findings: list[dict] | None = None,
-    ism_controls: list[dict] | None = None,
-    rules: list[dict] | None = None,
 ) -> str:
     lines = [
         f"RUN_ID: {run_id}",
@@ -55,13 +55,4 @@ def build_user_prompt(
     ]
     if prior_run_id:
         lines.append(f"PRIOR_RUN_ID: {prior_run_id}")
-    if findings is not None:
-        lines.append("FINDINGS:")
-        lines.append(json.dumps(findings, indent=2, default=str))
-    if ism_controls is not None:
-        lines.append("ISM_CONTROLS:")
-        lines.append(json.dumps(ism_controls, indent=2))
-    if rules is not None:
-        lines.append("RULES:")
-        lines.append(json.dumps(rules, indent=2))
     return "\n".join(lines)
