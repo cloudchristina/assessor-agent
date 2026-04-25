@@ -153,10 +153,15 @@ module "lambda_artefacts" {
         # using the zip's 1.41 SDK + an OTLP HTTP exporter targeting the ADOT
         # collector sidecar (still attached via the layer, listening on 4318).
         contains(["agent_narrator", "judge"], k) ? {
-          OTEL_SERVICE_NAME           = k
-          OTEL_RESOURCE_ATTRIBUTES    = "service.name=${k},service.namespace=assessor-agent"
-          OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318/v1/traces"
-          OTEL_PROPAGATORS            = "xray,tracecontext"
+          OTEL_SERVICE_NAME                  = k
+          OTEL_RESOURCE_ATTRIBUTES           = "service.name=${k},service.namespace=assessor-agent"
+          # NOTE: TRACES_ENDPOINT is the FULL URL — exporter does not append
+          # `/v1/traces`. Using the path-less OTEL_EXPORTER_OTLP_ENDPOINT
+          # would cause a 404 because the exporter appends `/v1/traces`,
+          # producing `http://localhost:4318/v1/traces/v1/traces` if both
+          # were set with paths.
+          OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://localhost:4318/v1/traces"
+          OTEL_PROPAGATORS                   = "xray,tracecontext"
         } : {},
         k == "agent_narrator" ? {
           BEDROCK_GUARDRAIL_ID = module.bedrock_guardrail.guardrail_id
