@@ -11,7 +11,7 @@
 
 Plan 2 implements all five eval defence layers from the parent spec Section 5. Layer 3 completion (adversarial probe + self-consistency) wires runtime safety nets into the existing pipeline. Layer 4 stands up the offline CI eval gate using `pytest + ragas + strands-agents[otel]`, with a 6-case smoke run on every push to `main` and a full 25-case nightly run that catches model drift. Layer 5 adds production drift detection — shadow evals on every prod run, a weekly canary against fixed historical fixtures, KS-test distribution drift, an email-only judge-degradation alarm (no pipeline halt), and a reviewer-disagreement loop that auto-promotes triage anomalies to golden-set candidates (UI ships in Plan 3 — Plan 2 stubs the data flow).
 
-Estimated steady-state cost: **~$170 / month** (smoke ~$1/push × ~30 pushes/month + full nightly ~$5/night × 30).
+Estimated steady-state cost: **~$180 / month** (smoke ~$1/push × ~30 pushes/month = $30, plus full nightly ~$5/night × 30 = $150). Cross-check with AWS Budgets thresholds (§6.1): $50 / $150 / $250 — the $150 threshold is set deliberately at the steady-state line so any sustained breach signals abnormal usage.
 
 ---
 
@@ -140,7 +140,7 @@ Insert `adversarial-probe` between `judge` and `publish-triage`:
 
 | Table | PK | SK | Purpose |
 |---|---|---|---|
-| `eval_results` | `eval_run_id` (S) | `case_id` (S) | One row per (CI eval run × golden case). Stores per-rule precision/recall, Ragas metrics, judge score, latency, cost (AUD), model_id, branch, commit_sha. GSI `branch_index` PK `branch` SK `started_at` for "latest run per branch". |
+| `eval_results` | `eval_run_id` (S) | `case_id` (S) | One row per (CI eval run × golden case). Attributes: `started_at` (S, ISO8601), `completed_at` (S), `branch` (S), `commit_sha` (S), `model_id` (S), `precision_per_rule` (M), `recall_per_rule` (M), `ragas_faithfulness` (N), `ragas_answer_relevance` (N), `ragas_context_precision` (N), `bertscore` (N), `judge_score` (M), `latency_ms` (N), `cost_aud` (N), `gates` (M), `s3_artefact_uri` (S). **GSI `branch_index`** PK=`branch`, SK=`started_at` for "latest run per branch". |
 | `drift_baseline` | `metric_name` (S) | `date` (S) | 30-day rolling history of {finding_count, severity_mix, token_count, principal_count_per_rule}. TTL 90 days. |
 | `golden_set_candidates` | `candidate_id` (S) | — | Reviewer-disagreement queue. Status: `pending` / `promoted` / `rejected`. Compliance reviews + promotes weekly. Plan 3 frontend writes from triage UI. |
 
@@ -180,6 +180,10 @@ The `bedrock-invocations` bucket is enabled via Bedrock model invocation logging
 ```
 evals/
 ├── golden/
+│   ├── fixtures/                        ← input CSVs referenced by `case_*.json`
+│   │   ├── case_001.csv
+│   │   ├── case_002.csv
+│   │   └── ...
 │   ├── case_001_baseline.json           ← hand-crafted: each rule fires once
 │   ├── case_002_dev_prod_sod.json       ← hand-crafted: R3 SoD breach
 │   ├── case_003_orphan_cluster.json     ← hand-crafted: 5 orphaned vendor accounts
@@ -289,7 +293,9 @@ def test_flipping_login_type_changes_only_r1():
 |---|---|---|---|---|
 | `push` to `main` | `smoke` | 6 (one per rule R1–R6) | per push | ~$1 |
 | `pull_request` | `smoke` (advisory only) | 6 | per push | ~$1 |
-| `schedule` cron `0 14 * * *` UTC (00:00 AEST) | `full` | 25 (10 golden + 6 adversarial + 6 counterfactual + 3 canary baselines) | nightly | ~$5 |
+| `schedule` cron `0 14 * * *` UTC (00:00 AEST) | `full` | 25 (10 golden + 6 adversarial + 6 counterfactual + 3 canary fixtures) | nightly | ~$5 |
+
+> The 3 canary fixtures *are* re-executed by the nightly suite (so we catch agent-narrator regressions against historical data inside CI). The weekly `canary-orchestrator` Lambda (§5.2) runs the same fixtures through the **deployed Step Functions pipeline** — not the eval harness — so the two are complementary, not duplicative: nightly tests agent quality; weekly tests pipeline-end-to-end quality. Total Bedrock cost double-up across both = ~3 × $0.20 = $0.60/week, negligible.
 | Manual `workflow_dispatch` | both | configurable | on-demand | varies |
 
 ### 4.2 GitHub Actions YAML (sketch)
@@ -312,7 +318,11 @@ jobs:
 
   eval-gate:
     needs: [lint-type-sec, unit-tests, property-tests]
-    if: github.event_name != 'pull_request' || github.base_ref == 'main'
+    # Gate runs on pushes to main, scheduled nightly, and manual dispatch.
+    # PRs run the eval suite via a separate `eval-advisory` job that posts
+    # the metric diff comment but does NOT block merge — keeps PR cycle
+    # fast and resilient to Bedrock throttling.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions: { id-token: write, contents: read, pull-requests: write }
     steps:
@@ -390,8 +400,8 @@ fail job if any threshold regressed > tolerance
 ### 5.1 Shadow-eval Lambda
 
 - Trigger: DDB stream `NEW_AND_OLD_IMAGES` on `runs` table when `status` transitions to `succeeded` / `quarantined`.
-- Behaviour: re-load narrative + findings from S3, call `judge` Lambda with `JUDGE_MODEL_ID_OVERRIDE=<latest-haiku>` (env var pointing at newest model alias). Compute `delta = abs(prod_score.faithfulness - shadow_score.faithfulness)`. If `delta > 0.05`, write to `drift_signals` DDB table + emit `DriftDetected` CloudWatch metric.
-- Output: DDB `runs[run_id].shadow_score = {faithfulness, completeness, fabrication, model_id}`.
+- Behaviour: re-load narrative + findings from S3, call `judge` Lambda with `JUDGE_MODEL_ID_OVERRIDE=<latest-haiku>` (env var pointing at newest model alias). Compute `delta = abs(prod_score.faithfulness - shadow_score.faithfulness)`. If `delta > 0.05`, write to `drift_signals` DDB table, emit `DriftDetected` CloudWatch metric, **and the metric feeds into a CloudWatch alarm that publishes to the same SNS topic as the degraded-state alarm (§5.5) → SES email to compliance.** Same notification channel; same email; one place to look.
+- Output: DDB `runs[run_id].shadow_score = {faithfulness, completeness, fabrication, model_id}`; DDB `drift_signals` row on threshold breach; SES email on alarm.
 
 ### 5.2 Canary-orchestrator Lambda
 
@@ -401,8 +411,15 @@ fail job if any threshold regressed > tolerance
   - start SFN execution with `cadence=canary, started_at=<iso>`
   - poll `describe-execution` until terminal state (max 5 min)
   - load resulting findings + judge score
-  - compare to baseline JSON; if any metric below `baseline - tolerance`, alarm
-- Output: DDB `canary_results[canary_run_id]`.
+  - compare to baseline JSON; alarm if any metric breaches its tolerance.
+- **Per-metric tolerances** (relative to baseline):
+  - precision/recall per rule: `± 0.05` (5% absolute)
+  - judge faithfulness: `± 0.10`
+  - finding count: `± 25%` (relative)
+  - p95 latency: `+ 30s` (one-sided)
+  - cost per run: `+ 50%` (one-sided)
+- **Alarm channel:** same SNS topic + SES email as §5.5 (one notification hub for all eval/drift signals).
+- Output: DDB `canary_results[canary_run_id]`; SES email on tolerance breach.
 
 ### 5.3 Drift-detector Lambda
 
@@ -497,6 +514,7 @@ For solo-dev demo scope: all roles collapse to "you" — separation re-emerges i
 |---|---|
 | AwsXRayIdGenerator integration (unify Lambda + Strands traces) | Polish — current "two-trace" view is workable; Plan 3 frontend can deep-link both |
 | Reviewer-disagreement UI (triage clicks) | Plan 3 |
+| Reviewer-disagreement **rate** alarm (parent §5.5: "rate > 15% per rule per week") | Deferred — Plan 2 ships the candidate-queue write + weekly digest email, which is the operational outcome. The threshold-based CloudWatch alarm is a small follow-on once Plan 3's UI surfaces real disagreement volume. |
 | Synthetic data generator with realistic abnormal-activity scenarios | Plan 4 |
 | Pipeline halt on judge degradation | Production hardening; not needed for demo / solo scope |
 | Per-region multi-account eval orchestration | Not in scope |
