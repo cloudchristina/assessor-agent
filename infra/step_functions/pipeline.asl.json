@@ -1,0 +1,332 @@
+{
+  "Comment": "IRAP UAR Agent pipeline. One execution = one audit run.",
+  "StartAt": "ExtractUar",
+  "States": {
+    "ExtractUar": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${extract_uar_arn}",
+        "Payload": {
+          "cadence.$": "$.cadence",
+          "started_at.$": "$.started_at"
+        }
+      },
+      "ResultSelector": {
+        "csv_s3_uri.$": "$.Payload.csv_s3_uri",
+        "manifest_s3_uri.$": "$.Payload.manifest_s3_uri",
+        "bucket.$": "$.Payload.bucket",
+        "run_id.$": "$.Payload.run_id"
+      },
+      "ResultPath": "$.extract",
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2.0,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "ValidateAndHash"
+    },
+    "ValidateAndHash": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${validate_and_hash_arn}",
+        "Payload": {
+          "csv_s3_uri.$": "$.extract.csv_s3_uri",
+          "manifest_s3_uri.$": "$.extract.manifest_s3_uri",
+          "bucket.$": "$.extract.bucket",
+          "started_at.$": "$.started_at"
+        }
+      },
+      "ResultSelector": {
+        "run_id.$": "$.Payload.run_id",
+        "rows_s3_uri.$": "$.Payload.rows_s3_uri",
+        "manifest.$": "$.Payload.manifest",
+        "bucket.$": "$.Payload.bucket",
+        "cadence.$": "$.Payload.cadence"
+      },
+      "ResultPath": "$.validated",
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2.0,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "RulesEngine"
+    },
+    "RulesEngine": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${rules_engine_arn}",
+        "Payload": {
+          "run_id.$": "$.validated.run_id",
+          "rows_s3_uri.$": "$.validated.rows_s3_uri",
+          "bucket.$": "$.validated.bucket"
+        }
+      },
+      "ResultSelector": {
+        "run_id.$": "$.Payload.run_id",
+        "findings_s3_uri.$": "$.Payload.findings_s3_uri",
+        "summary.$": "$.Payload.summary",
+        "findings_count.$": "$.Payload.findings_count",
+        "finding_ids.$": "$.Payload.finding_ids"
+      },
+      "ResultPath": "$.rules",
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2.0,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "AgentNarrator"
+    },
+    "AgentNarrator": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${agent_narrator_arn}",
+        "Payload": {
+          "run_id.$": "$.rules.run_id",
+          "summary.$": "$.rules.summary",
+          "finding_ids.$": "$.rules.finding_ids",
+          "bucket.$": "$.validated.bucket",
+          "prior_run_id": null
+        }
+      },
+      "ResultSelector": {
+        "run_id.$": "$.Payload.run_id",
+        "narrative_s3_uri.$": "$.Payload.narrative_s3_uri",
+        "model_id.$": "$.Payload.model_id"
+      },
+      "ResultPath": "$.narrative",
+      "Retry": [
+        {
+          "ErrorEquals": ["Bedrock.ThrottlingException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 3,
+          "BackoffRate": 2.0,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "GatesParallel"
+    },
+    "GatesParallel": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "CitationGate",
+          "States": {
+            "CitationGate": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "${citation_gate_arn}",
+                "Payload": {
+                  "narrative_s3_uri.$": "$.narrative.narrative_s3_uri",
+                  "findings_s3_uri.$": "$.rules.findings_s3_uri"
+                }
+              },
+              "ResultSelector": {
+                "gate.$": "$.Payload.gate",
+                "passed.$": "$.Payload.passed",
+                "passed_int.$": "$.Payload.passed_int",
+                "missing_ids.$": "$.Payload.missing_ids"
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "ReconciliationGate",
+          "States": {
+            "ReconciliationGate": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "${reconciliation_gate_arn}",
+                "Payload": {
+                  "narrative_s3_uri.$": "$.narrative.narrative_s3_uri",
+                  "findings_s3_uri.$": "$.rules.findings_s3_uri"
+                }
+              },
+              "ResultSelector": {
+                "gate.$": "$.Payload.gate",
+                "passed.$": "$.Payload.passed",
+                "passed_int.$": "$.Payload.passed_int",
+                "reasons.$": "$.Payload.reasons"
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "EntityGroundingGate",
+          "States": {
+            "EntityGroundingGate": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "${entity_grounding_gate_arn}",
+                "Payload": {
+                  "narrative_s3_uri.$": "$.narrative.narrative_s3_uri",
+                  "findings_s3_uri.$": "$.rules.findings_s3_uri"
+                }
+              },
+              "ResultSelector": {
+                "gate.$": "$.Payload.gate",
+                "passed.$": "$.Payload.passed",
+                "passed_int.$": "$.Payload.passed_int",
+                "ungrounded_entities.$": "$.Payload.ungrounded_entities",
+                "false_negations.$": "$.Payload.false_negations"
+              },
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.gate_results",
+      "Next": "MergeGates"
+    },
+    "MergeGates": {
+      "Type": "Pass",
+      "Parameters": {
+        "citation.$": "$.gate_results[0].passed",
+        "reconciliation.$": "$.gate_results[1].passed",
+        "entity_grounding.$": "$.gate_results[2].passed",
+        "passed_sum.$": "States.MathAdd(States.MathAdd($.gate_results[0].passed_int, $.gate_results[1].passed_int), $.gate_results[2].passed_int)"
+      },
+      "ResultPath": "$.gates",
+      "Next": "GateChoice"
+    },
+    "GateChoice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.gates.passed_sum",
+          "NumericEquals": 3,
+          "Next": "Judge"
+        }
+      ],
+      "Default": "MarkQuarantined"
+    },
+    "Judge": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${judge_arn}",
+        "Payload": {
+          "narrative_s3_uri.$": "$.narrative.narrative_s3_uri",
+          "findings_s3_uri.$": "$.rules.findings_s3_uri"
+        }
+      },
+      "ResultSelector": {
+        "gate.$": "$.Payload.gate",
+        "passed.$": "$.Payload.passed",
+        "passed_int.$": "$.Payload.passed_int",
+        "faithfulness.$": "$.Payload.faithfulness",
+        "completeness.$": "$.Payload.completeness",
+        "fabrication.$": "$.Payload.fabrication",
+        "reasoning.$": "$.Payload.reasoning"
+      },
+      "ResultPath": "$.judge",
+      "Retry": [
+        {
+          "ErrorEquals": ["Bedrock.ThrottlingException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 3,
+          "BackoffRate": 2.0,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "JudgeChoice"
+    },
+    "JudgeChoice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.judge.passed",
+          "BooleanEquals": true,
+          "Next": "Publish"
+        }
+      ],
+      "Default": "MarkQuarantined"
+    },
+    "MarkQuarantined": {
+      "Type": "Pass",
+      "Parameters": {
+        "all_gates_passed": false
+      },
+      "ResultPath": "$.quarantine",
+      "Next": "Publish"
+    },
+    "Publish": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${publish_triage_arn}",
+        "Payload": {
+          "run_id.$": "$.validated.run_id",
+          "cadence.$": "$.validated.cadence",
+          "started_at.$": "$.started_at",
+          "manifest.$": "$.validated.manifest",
+          "findings_s3_uri.$": "$.rules.findings_s3_uri",
+          "narrative_s3_uri.$": "$.narrative.narrative_s3_uri",
+          "gates.$": "$.gates",
+          "judge_score.$": "$.judge",
+          "all_gates_passed.$": "$.judge.passed",
+          "trace_id.$": "$$.Execution.Name"
+        }
+      },
+      "ResultSelector": {
+        "run_id.$": "$.Payload.run_id",
+        "findings_count.$": "$.Payload.findings_count"
+      },
+      "ResultPath": "$.publish",
+      "Next": "CadenceChoice"
+    },
+    "CadenceChoice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.validated.cadence",
+          "StringEquals": "monthly",
+          "Next": "GeneratePdf"
+        }
+      ],
+      "Default": "Succeed"
+    },
+    "GeneratePdf": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${generate_pdf_arn}",
+        "Payload": {
+          "run_id.$": "$.validated.run_id",
+          "bucket.$": "$.validated.bucket",
+          "cadence.$": "$.validated.cadence",
+          "started_at.$": "$.started_at",
+          "manifest.$": "$.validated.manifest",
+          "findings_s3_uri.$": "$.rules.findings_s3_uri",
+          "narrative_s3_uri.$": "$.narrative.narrative_s3_uri",
+          "trace_id.$": "$$.Execution.Name"
+        }
+      },
+      "ResultSelector": {
+        "run_id.$": "$.Payload.run_id",
+        "pdf_s3_uri.$": "$.Payload.pdf_s3_uri",
+        "bytes.$": "$.Payload.bytes"
+      },
+      "ResultPath": "$.pdf",
+      "Next": "Succeed"
+    },
+    "Succeed": {
+      "Type": "Succeed"
+    }
+  }
+}

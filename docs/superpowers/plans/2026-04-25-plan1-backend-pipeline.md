@@ -2889,7 +2889,7 @@ cd infra/terraform/modules/lambda_artefacts && terraform init -backend=false && 
 - Create: `infra/step_functions/pipeline.asl.json`
 - Create: `infra/terraform/modules/step_functions/{main,variables,outputs}.tf`
 
-- [ ] **Step 1: Write the ASL definition** following the table above. Each Task state uses `Parameters` to project its Lambda-specific event from `$`, and `ResultPath` to merge the Lambda response back. Example for `ValidateAndHash`:
+- [x] **Step 1: Write the ASL definition** following the table above. Each Task state uses `Parameters` to project its Lambda-specific event from `$`, and `ResultPath` to merge the Lambda response back. Example for `ValidateAndHash`:
 
 ```json
 "ValidateAndHash": {
@@ -3066,7 +3066,7 @@ Apply the same pattern to every Task state. Bedrock-invoking states (`AgentNarra
 
 `$$.Execution.Name` is the Step Functions execution context name, used as the trace_id reference.
 
-- [ ] **Step 2: A pre-narrator Pass state** (`PrepareAgentInput`) reads `rules.findings_s3_uri`, but we cannot read S3 from a Pass state. Solution: the rules-engine handler (Task 2.9) is updated to return `finding_ids: list[str]` directly in its event response (slim — IDs only, not full findings). Add this to the rules-engine return value:
+- [x] **Step 2: A pre-narrator Pass state** (`PrepareAgentInput`) reads `rules.findings_s3_uri`, but we cannot read S3 from a Pass state. Solution: the rules-engine handler (Task 2.9) is updated to return `finding_ids: list[str]` directly in its event response (slim — IDs only, not full findings). Add this to the rules-engine return value:
 
 ```python
 return {
@@ -3081,9 +3081,9 @@ Update Task 2.9's test to assert this field. The `AgentNarrator` Parameters then
 "finding_ids.$": "$.rules.finding_ids"
 ```
 
-- [ ] **Step 3: Write Terraform module** — wraps `aws_sfn_state_machine` with logging configuration to CloudWatch (log group, KMS-encrypted) and X-Ray tracing on.
+- [x] **Step 3: Write Terraform module** — wraps `aws_sfn_state_machine` with logging configuration to CloudWatch (log group, KMS-encrypted) and X-Ray tracing on.
 
-- [ ] **Step 4: Validate ASL**
+- [x] **Step 4: Validate ASL**
 
 ```bash
 aws stepfunctions validate-state-machine-definition \
@@ -3092,7 +3092,7 @@ aws stepfunctions validate-state-machine-definition \
 
 Add this as a CI step in `.github/workflows/ci.yml`.
 
-- [ ] **Step 5: Commit** `feat(infra): add Step Functions state machine with full payload threading`
+- [x] **Step 5: Commit** `feat(infra): add Step Functions state machine with full payload threading`
 
 ---
 
@@ -3103,7 +3103,7 @@ Add this as a CI step in `.github/workflows/ci.yml`.
 - Modify: `infra/terraform/main.tf` (compose all modules)
 - Modify: `infra/terraform/outputs.tf`
 
-- [ ] **Step 1: EventBridge module** — two `aws_scheduler_schedule` resources (weekly + monthly cron) targeting **the Step Functions state machine**. Input JSON:
+- [x] **Step 1: EventBridge module** — two `aws_scheduler_schedule` resources (weekly + monthly cron) targeting **the Step Functions state machine**. Input JSON:
 
 ```json
 {
@@ -3114,7 +3114,7 @@ Add this as a CI step in `.github/workflows/ci.yml`.
 
 (`<<aws.scheduler.scheduled-time>>` is EventBridge Scheduler's runtime-resolved placeholder.) IAM role for scheduler-to-stepfunctions with `states:StartExecution` on the state machine ARN.
 
-- [ ] **Step 2: Compose in `main.tf`** — instantiate all modules in dependency order:
+- [x] **Step 2: Compose in `main.tf`** — instantiate all modules in dependency order:
 
 ```
 kms
@@ -3131,9 +3131,9 @@ kms
 
 > **KMS-IAM circular dependency resolver:** `iam_roles` produces role ARNs that need to appear in `kms` key policies (so the Lambdas can decrypt). To avoid a Terraform cycle, the `kms` module accepts an optional `additional_principals` variable (default `[]`); after `iam_roles` is applied, a follow-up `aws_kms_key_policy` resource (in `main.tf`, not in the kms module) attaches the role ARNs to each key policy. This is documented inline in `main.tf`.
 
-- [ ] **Step 3: `terraform fmt`, `terraform validate`, `tflint`, `tfsec` all clean**
+- [x] **Step 3: `terraform fmt`, `terraform validate`, `tflint`, `tfsec` all clean**
 
-- [ ] **Step 4: First real deploy to sandbox account**
+- [x] **Step 4: First real deploy to sandbox account**
 
 ```bash
 cd infra/terraform
@@ -3147,7 +3147,7 @@ terraform apply -var-file=envs/dev.tfvars
 
 Expected: `Apply complete! Resources: ~40 added, 0 changed, 0 destroyed.`
 
-- [ ] **Step 5: Smoke-trigger an execution**
+- [x] **Step 5: Smoke-trigger an execution**
 
 ```bash
 aws stepfunctions start-execution \
@@ -3158,7 +3158,7 @@ aws stepfunctions start-execution \
 
 Open Step Functions console; expect the execution to fail at `ExtractUar` because no SQL Server credentials are wired up yet. That is acceptable — the wiring of real DB creds is environment-specific. Phase 10 covers an end-to-end run using the synthetic-data fallback path (Task 4.5).
 
-- [ ] **Step 6: Commit** `feat(infra): wire eventbridge + compose all modules in main.tf`
+- [x] **Step 6: Commit** `feat(infra): wire eventbridge + compose all modules in main.tf`
 
 ---
 
