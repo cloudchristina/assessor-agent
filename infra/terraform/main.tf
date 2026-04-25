@@ -150,10 +150,16 @@ module "lambda_artefacts" {
         # handler, which initialises the OTel SDK with an OTLP exporter
         # pointing at the in-process ADOT collector. Strands' get_tracer()
         # then emits agent/tool/model spans that ADOT forwards to X-Ray.
+        #
+        # PYTHONPATH=/opt/python forces the layer's OTel packages to win over
+        # the zip's transitive copies (Strands brings in older opentelemetry-*
+        # which collides with the layer's newer exporters; symptom: ImportError
+        # on `LogData` from opentelemetry.sdk._logs at wrapper init time).
         contains(["agent_narrator", "judge"], k) ? {
           AWS_LAMBDA_EXEC_WRAPPER  = "/opt/otel-instrument"
           OTEL_RESOURCE_ATTRIBUTES = "service.name=${k},service.namespace=assessor-agent"
           OTEL_PROPAGATORS         = "xray,tracecontext"
+          PYTHONPATH               = "/opt/python"
         } : {},
         k == "agent_narrator" ? {
           BEDROCK_GUARDRAIL_ID = module.bedrock_guardrail.guardrail_id
