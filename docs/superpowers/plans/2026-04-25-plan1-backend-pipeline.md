@@ -1947,15 +1947,15 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
 - Create: `src/extract_uar/sql_queries.py`
 - Create: `tests/unit/test_connection.py`
 
-- [ ] **Step 1: Failing test** — connection factory accepts host/port/user/pass, returns a `pymssql.Connection`-like protocol; raises on missing TLS (using `unittest.mock`).
+- [x] **Step 1: Failing test** — connection factory accepts host/port/user/pass, returns a `pymssql.Connection`-like protocol; raises on missing TLS (using `unittest.mock`).
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement** — `get_connection(...)` calls `pymssql.connect` with `tds_version="7.4"` and `encrypt="strict"` (or equivalent — verify pymssql current API). Adds connection-level retry via `tenacity` for transient errors using `MAX_RETRIES`. `sql_queries.py` holds the four SQL constants from the user's existing code.
+- [x] **Step 3: Implement** — `get_connection(...)` calls `pymssql.connect` with `tds_version="7.4"` and `encrypt="strict"` (or equivalent — verify pymssql current API). Adds connection-level retry via `tenacity` for transient errors using `MAX_RETRIES`. `sql_queries.py` holds the four SQL constants from the user's existing code.
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(extract): add TLS-enforcing connection factory and retry`
+- [x] **Step 5: Commit** `feat(extract): add TLS-enforcing connection factory and retry`
 
 ---
 
