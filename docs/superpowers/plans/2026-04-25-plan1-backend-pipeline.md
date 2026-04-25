@@ -1294,7 +1294,7 @@ git commit -m "feat(rules): add R1 SQL login with admin access (ISM-1546)"
 - Create: `src/rules_engine/rules/r2_dormant_admin.py`
 - Create: `tests/unit/test_rule_r2.py`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 ```python
 from datetime import datetime, timedelta
@@ -1342,9 +1342,9 @@ def test_uses_config_threshold():
     assert len(findings) == 1
 ```
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """R2: Dormant privileged account (ISM-1509 / 1555)."""
@@ -1394,9 +1394,9 @@ class R2DormantAdmin(Rule):
         return out
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/rules_engine/rules/r2_dormant_admin.py tests/unit/test_rule_r2.py
