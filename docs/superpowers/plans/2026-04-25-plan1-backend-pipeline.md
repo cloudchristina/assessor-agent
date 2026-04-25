@@ -1059,7 +1059,7 @@ git commit -m "feat(shared): add Powertools-backed structured logger"
 - Create: `src/rules_engine/engine.py`
 - Create: `tests/unit/test_rules_engine.py`
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 ```python
 from datetime import datetime
@@ -1093,9 +1093,9 @@ def test_engine_returns_zero_findings_with_noop_rule():
     assert out.principals_scanned == 1
 ```
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/rules_engine/__init__.py`: empty.
 `src/rules_engine/rules/__init__.py`: empty (RULES list comes in Task 2.7).
@@ -1165,9 +1165,9 @@ def _summarise(findings: list[Finding], rules: list[Rule]) -> dict[str, int]:
     return out
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/rules_engine tests/unit/test_rules_engine.py
