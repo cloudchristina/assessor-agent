@@ -2613,20 +2613,20 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
 - Create: `src/generate_pdf/handler.py`
 - Create: `tests/unit/test_generate_pdf.py`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 Cases:
 1. Given a run + findings + narrative, produces a PDF whose first-page text contains run_id, trace_id, manifest_sha256.
 2. PDF binary written to S3 with correct key `reports/YYYY-MM/attestation_<run_id>.pdf`.
 3. Snapshot test: byte-length within ±5% of fixed reference on a fixed input.
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement** — ReportLab-based template producing cover page + summary table + findings table grouped by severity + narrative section + ISM control map appendix. `templates.py` exports `render_pdf(run, findings, narrative) -> bytes`. `handler.py` reads inputs from S3, calls render, writes PDF to `reports/` (no Object Lock setting in code — Object Lock is bucket-level; configured in Terraform).
+- [x] **Step 3: Implement** — ReportLab-based template producing cover page + summary table + findings table grouped by severity + narrative section + ISM control map appendix. `templates.py` exports `render_pdf(run, findings, narrative) -> bytes`. `handler.py` reads inputs from S3, calls render, writes PDF to `reports/` (no Object Lock setting in code — Object Lock is bucket-level; configured in Terraform).
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(pdf): add generate-attestation-pdf Lambda (C13) with ReportLab template`
+- [x] **Step 5: Commit** `feat(pdf): add generate-attestation-pdf Lambda (C13) with ReportLab template`
 
 ---
 
