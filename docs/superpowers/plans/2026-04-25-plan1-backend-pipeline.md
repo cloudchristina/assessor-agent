@@ -570,7 +570,7 @@ git commit -m "chore: add CI workflow (lint, type, security, tests, terraform va
 - Create: `tests/conftest.py`
 - Create: `tests/unit/test_models.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 `tests/unit/test_models.py`:
 ```python
@@ -642,14 +642,14 @@ def test_extract_manifest_round_trip():
     assert ExtractManifest.model_validate_json(m.model_dump_json()) == m
 ```
 
-- [ ] **Step 2: Run test — confirm fails (module not found)**
+- [x] **Step 2: Run test — confirm fails (module not found)**
 
 ```bash
 pytest tests/unit/test_models.py -v
 ```
 Expected: `ModuleNotFoundError: No module named 'src.shared.models'`
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/shared/__init__.py`: empty file.
 
@@ -696,14 +696,14 @@ class ExtractManifest(BaseModel):
     schema_version: str
 ```
 
-- [ ] **Step 4: Run test — confirm passes**
+- [x] **Step 4: Run test — confirm passes**
 
 ```bash
 pytest tests/unit/test_models.py -v
 ```
 Expected: 3 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/shared tests/__init__.py tests/conftest.py tests/unit/__init__.py tests/unit/test_models.py
