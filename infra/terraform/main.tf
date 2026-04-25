@@ -141,6 +141,12 @@ module "lambda_artefacts" {
         } : {},
         k == "agent_narrator" ? {
           BEDROCK_GUARDRAIL_ID = module.bedrock_guardrail.guardrail_id
+          # Cross-region inference profile (Sydney). Sonnet 4.6 isn't
+          # invocable on-demand in ap-southeast-2; the AU profile is.
+          BEDROCK_MODEL_ID = "au.anthropic.claude-sonnet-4-6"
+        } : {},
+        k == "judge" ? {
+          JUDGE_MODEL_ID = "au.anthropic.claude-haiku-4-5-20251001-v1:0"
         } : {},
       )
     }

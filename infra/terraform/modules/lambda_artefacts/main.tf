@@ -53,4 +53,13 @@ module "fn" {
   dead_letter_target_arn    = aws_sqs_queue.dlq[each.key].arn
 
   cloudwatch_logs_retention_in_days = 30
+
+  # Build wheels inside the official Lambda Python image so native
+  # extensions (pymssql._pymssql, pydantic_core) match Lambda's arm64
+  # Linux ABI. The image must be present locally — the module's
+  # `docker images` lookup short-circuits the build step that would
+  # otherwise need a Dockerfile. Pull with:
+  #   docker pull public.ecr.aws/lambda/python:3.13-arm64
+  build_in_docker = true
+  docker_image    = "public.ecr.aws/lambda/python:3.13-arm64"
 }
