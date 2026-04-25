@@ -125,19 +125,43 @@ module "lambda_artefacts" {
       role_arn = module.iam_roles.lambda_role_arns[k]
       memory   = spec.memory
       timeout  = spec.timeout
+      # ADOT Python arm64 layer for OTel auto-instrumentation. Attached only
+      # to Lambdas where Strands emits tool/model OTel spans we want to see in
+      # X-Ray. Layer ARN is a sourceable AWS-managed layer; pin via
+      # var.adot_python_layer_arn.
+      layers = contains(["agent_narrator", "judge"], k) ? [var.adot_python_layer_arn] : []
       env = merge(
         {
           POWERTOOLS_SERVICE_NAME = k
           RUNS_BUCKET             = module.s3_buckets.runs_bucket_name
         },
         k == "extract_uar" ? {
-          SECRETS_MANAGER_ARNS = jsonencode(module.secrets.secret_arns)
+          SECRETS_MANAGER_ARNS  = jsonencode(module.secrets.secret_arns)
+          SYNTHETIC_DATA_S3_URI = "s3://${module.s3_buckets.runs_bucket_name}/fixtures/synth.csv"
         } : {},
         contains(["agent_narrator", "publish_triage"], k) ? {
           FINDINGS_TABLE = module.dynamodb.findings_table_name
         } : {},
         k == "publish_triage" ? {
           RUNS_TABLE = module.dynamodb.runs_table_name
+        } : {},
+        # OTel manual init: Strands' transitive opentelemetry-* (1.41) doesn't
+        # play nicely with the ADOT layer's older copies (1.32) when the
+        # auto-instrumentation wrapper (AWS_LAMBDA_EXEC_WRAPPER) is active —
+        # the wrapper crashes on a LogData ImportError. We therefore skip the
+        # wrapper and configure the OTel SDK manually in src/shared/otel_init.py
+        # using the zip's 1.41 SDK + an OTLP HTTP exporter targeting the ADOT
+        # collector sidecar (still attached via the layer, listening on 4318).
+        contains(["agent_narrator", "judge"], k) ? {
+          OTEL_SERVICE_NAME                  = k
+          OTEL_RESOURCE_ATTRIBUTES           = "service.name=${k},service.namespace=assessor-agent"
+          # NOTE: TRACES_ENDPOINT is the FULL URL — exporter does not append
+          # `/v1/traces`. Using the path-less OTEL_EXPORTER_OTLP_ENDPOINT
+          # would cause a 404 because the exporter appends `/v1/traces`,
+          # producing `http://localhost:4318/v1/traces/v1/traces` if both
+          # were set with paths.
+          OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://localhost:4318/v1/traces"
+          OTEL_PROPAGATORS                   = "xray,tracecontext"
         } : {},
         k == "agent_narrator" ? {
           BEDROCK_GUARDRAIL_ID = module.bedrock_guardrail.guardrail_id

@@ -14,6 +14,10 @@ why the previous implementation showed no tool calls in X-Ray.
 """
 from __future__ import annotations
 import os
+# Must come BEFORE `from strands import ...` so the OTel TracerProvider is
+# set before Strands reads it via get_tracer_provider().
+import src.shared.otel_init  # noqa: F401
+
 import boto3
 from strands import Agent
 from strands.models.bedrock import BedrockModel
@@ -88,6 +92,7 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
             "findings_count": len(event["finding_ids"]),
         },
     )
+    src.shared.otel_init.flush_otel()
     return {
         "run_id": run_id,
         "narrative_s3_uri": f"s3://{bucket}/{out_key}",
