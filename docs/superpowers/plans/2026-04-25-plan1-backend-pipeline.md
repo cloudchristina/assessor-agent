@@ -1820,7 +1820,7 @@ def extract_entities(text: str) -> dict[str, set]:
 - Create: `src/entity_grounding_gate/handler.py`
 - Modify: `tests/unit/test_entity_grounding.py`
 
-- [ ] **Step 1: Failing tests** (handler integration with moto + negation cases)
+- [x] **Step 1: Failing tests** (handler integration with moto + negation cases)
 
 Cases:
 1. Narrative cites only entities present in findings → passed=True
@@ -1828,9 +1828,9 @@ Cases:
 3. Narrative says "no issues with `appdb_prod`" but findings has 1 `R1` for `appdb_prod` → passed=False, lists false_negation
 4. Narrative says "no findings this cycle" with 0 findings → passes (correct negation)
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement** `negation_check.py`:
+- [x] **Step 3: Implement** `negation_check.py`:
 
 ```python
 """Detect 'no issues with X' / 'no findings for X' phrases and assert truth."""
@@ -1911,9 +1911,9 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
     }
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(gates): add entity-grounding-gate Lambda (C8) with negation-consistency`
+- [x] **Step 5: Commit** `feat(gates): add entity-grounding-gate Lambda (C8) with negation-consistency`
 
 ---
 
