@@ -893,7 +893,7 @@ git commit -am "feat(shared): add NarrativeReport/JudgeScore/TriageDecision mode
 - Create: `src/shared/ism_controls.py`
 - Create: `tests/unit/test_ism_controls.py`
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 ```python
 from src.shared.ism_controls import get_ism_control, ISMControlSpec
@@ -909,9 +909,9 @@ def test_lookup_unknown_raises():
         get_ism_control("ISM-9999")
 ```
 
-- [ ] **Step 2: Run — fails**
+- [x] **Step 2: Run — fails**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """Static ISM control catalogue. Source: official ISM (current at time of writing)."""
@@ -990,9 +990,9 @@ def get_ism_control(control_id: str) -> ISMControlSpec:
     return _CATALOGUE[control_id]
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/shared/ism_controls.py tests/unit/test_ism_controls.py
