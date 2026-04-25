@@ -1182,7 +1182,7 @@ git commit -m "feat(rules): add Rule abstract class and engine skeleton"
 - Create: `src/rules_engine/rules/r1_sql_login_admin.py`
 - Create: `tests/unit/test_rule_r1.py`
 
-- [ ] **Step 1: Failing tests** (full coverage of rule logic)
+- [x] **Step 1: Failing tests** (full coverage of rule logic)
 
 ```python
 from datetime import datetime
@@ -1230,9 +1230,9 @@ def test_r1_dedupes_per_principal_across_databases():
     assert set(findings[0].databases) == {"db1 (s1)"}
 ```
 
-- [ ] **Step 2: Fails (module not found)**
+- [x] **Step 2: Fails (module not found)**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```python
 """R1: SQL login with Admin access (ISM-1546)."""
@@ -1275,9 +1275,9 @@ class R1SqlLoginAdmin(Rule):
         return out
 ```
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/rules_engine/rules/r1_sql_login_admin.py tests/unit/test_rule_r1.py
