@@ -2112,7 +2112,7 @@ git commit -m "feat(extract): add CSV codec + writer with deterministic SHA-256 
 - Create: `tests/integration/conftest.py`
 - Create: `tests/integration/test_extract_e2e.py`
 
-- [ ] **Step 1: Failing integration test** (moto for S3 + Secrets Manager; mocked pymssql cursor)
+- [x] **Step 1: Failing integration test** (moto for S3 + Secrets Manager; mocked pymssql cursor)
 
 Test: handler invoked with `{"cadence":"weekly", "started_at":"2026-04-25T09:00:00+10:00"}` → reads secrets → mocked pymssql returns rows → CSV + manifest written to S3 → handler returns:
 
@@ -2127,9 +2127,9 @@ Test: handler invoked with `{"cadence":"weekly", "started_at":"2026-04-25T09:00:
 
 This is the contract the SFN `ExtractUar` state's `ResultSelector` (Task 9.9) projects into `$.extract`. Coverage: missing secret raises; one server unreachable fails the whole run (no silent skip).
 
-- [ ] **Step 2: Fails**
+- [x] **Step 2: Fails**
 
-- [ ] **Step 3: Implement** — handler with:
+- [x] **Step 3: Implement** — handler with:
   - `get_server_configs()` lazy inside handler (not module-level).
   - Use `MAX_RETRIES` via tenacity.
   - Replace `except: continue` with explicit collection of failures and a final `raise RuntimeError(...)` if any server failed.
@@ -2138,9 +2138,9 @@ This is the contract the SFN `ExtractUar` state's `ResultSelector` (Task 9.9) pr
   - Honour `Australia/Sydney` timezone via `zoneinfo`.
   - Synthetic-data mode: if env var `SYNTHETIC_DATA_S3_URI` is set, skip pymssql entirely and read fixture rows from S3 (used for the demo).
 
-- [ ] **Step 4: Passes**
+- [x] **Step 4: Passes**
 
-- [ ] **Step 5: Commit** `feat(extract): refactor handler with lazy secrets, fail-loud errors, JSON logs`
+- [x] **Step 5: Commit** `feat(extract): refactor handler with lazy secrets, fail-loud errors, JSON logs`
 
 ---
 
