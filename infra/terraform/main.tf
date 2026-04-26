@@ -272,3 +272,25 @@ module "eval_alarms" {
   canary_results_table_name = module.dynamodb.canary_results_table_name
   tags                      = local.common_tags
 }
+
+module "bedrock_invocations" {
+  source      = "./modules/bedrock_invocations"
+  name_prefix = local.name_prefix
+  # Let the module create its own KMS key; the existing keys (raw/findings/reports)
+  # are scoped to pipeline data, not Bedrock invocation logs.
+  kms_key_arn = ""
+  tags        = local.common_tags
+}
+
+module "bedrock_logging_config" {
+  source      = "./modules/bedrock_logging_config"
+  bucket_arn  = module.bedrock_invocations.bucket_arn
+  bucket_name = module.bedrock_invocations.bucket_name
+}
+
+module "aws_budgets" {
+  source      = "./modules/aws_budgets"
+  name_prefix = local.name_prefix
+  email       = var.owner_email
+  tags        = local.common_tags
+}
