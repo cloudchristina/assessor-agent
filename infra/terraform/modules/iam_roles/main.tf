@@ -472,9 +472,10 @@ data "aws_iam_policy_document" "canary_orchestrator" {
     resources = ["${var.runs_bucket_arn}/fixtures/*", "${var.runs_bucket_arn}/canary/*"]
   }
   statement {
-    effect    = "Allow"
-    actions   = ["kms:Encrypt", "kms:Decrypt", "kms:GenerateDataKey"]
-    resources = [var.kms_raw_arn]
+    effect  = "Allow"
+    actions = ["kms:Encrypt", "kms:Decrypt", "kms:GenerateDataKey"]
+    # Needs both raw (S3 fixture upload + read) and findings (runs DDB table SSE).
+    resources = [var.kms_raw_arn, var.kms_findings_arn]
   }
 }
 
