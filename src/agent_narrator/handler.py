@@ -67,13 +67,13 @@ def _has_critical_findings(summary: dict) -> bool:
 def _narrative_key(report: NarrativeReport) -> frozenset:
     """Stable fingerprint of the narrative's cited findings for consistency comparison.
 
-    Uses (finding_id, ism_citation) pairs from finding_narratives.  Two reports
-    are 'consistent' when their fingerprints are identical — i.e. the agent cited
-    the same findings with the same ISM mappings across re-runs.
+    Uses finding_id only. ISM citations are deliberately excluded — the model
+    legitimately picks between adjacent ISM controls (e.g. ISM-1545 vs ISM-1546)
+    even at low temperature, and such jitter shouldn't trip self-consistency.
+    The signal we care about is "did the agent cite the SAME set of findings
+    across re-runs", which finding_id alone captures.
     """
-    return frozenset(
-        (n.finding_id, n.ism_citation) for n in report.finding_narratives
-    )
+    return frozenset(n.finding_id for n in report.finding_narratives)
 
 
 def _self_consistency_check(user_prompt: str, primary_report: NarrativeReport) -> bool:
