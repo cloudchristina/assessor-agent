@@ -33,6 +33,10 @@ module "fn" {
       prefix_in_zip = "src"
     },
     {
+      path          = var.evals_root
+      prefix_in_zip = "evals"
+    },
+    {
       path             = var.requirements_path
       pip_requirements = true
     },

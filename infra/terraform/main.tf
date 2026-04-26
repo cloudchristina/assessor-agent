@@ -9,6 +9,7 @@
 
 locals {
   src_root          = "${path.module}/../../src"
+  evals_root        = "${path.module}/../../evals"
   requirements_path = "${path.module}/lambda-requirements.txt"
 
   # One source-of-truth map keyed by logical (snake_case) lambda name.
@@ -151,6 +152,7 @@ module "lambda_artefacts" {
   name_prefix       = local.name_prefix
   deploy_bucket     = module.s3_buckets.runs_bucket_name
   src_root          = local.src_root
+  evals_root        = local.evals_root
   requirements_path = local.requirements_path
 
   lambdas = {

@@ -446,12 +446,15 @@ resource "aws_iam_role_policy" "shadow_eval" {
 # with a synthetic fixture, waits, then writes canary results to DDB.
 data "aws_iam_policy_document" "canary_orchestrator" {
   statement {
-    effect  = "Allow"
-    actions = ["states:StartExecution", "states:DescribeExecution"]
-    # Wildcard avoids a cycle: iam_roles -> step_functions -> lambda_artefacts -> iam_roles.
-    # The canary orchestrator only ever starts the one pipeline state machine
-    # in this name-prefix, which is constrained by the IAM boundary anyway.
+    effect    = "Allow"
+    actions   = ["states:StartExecution"]
     resources = ["arn:aws:states:*:*:stateMachine:${var.name_prefix}-*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["states:DescribeExecution"]
+    # DescribeExecution operates on execution ARNs, distinct from stateMachine ARNs.
+    resources = ["arn:aws:states:*:*:execution:${var.name_prefix}-*:*"]
   }
   statement {
     effect    = "Allow"
@@ -466,7 +469,7 @@ data "aws_iam_policy_document" "canary_orchestrator" {
   statement {
     effect    = "Allow"
     actions   = ["s3:PutObject", "s3:GetObject"]
-    resources = ["${var.runs_bucket_arn}/fixtures/*"]
+    resources = ["${var.runs_bucket_arn}/fixtures/*", "${var.runs_bucket_arn}/canary/*"]
   }
   statement {
     effect    = "Allow"

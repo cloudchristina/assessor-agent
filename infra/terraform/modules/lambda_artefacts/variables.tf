@@ -13,6 +13,11 @@ variable "src_root" {
   description = "Absolute path to the repo's src/ directory — ships under a `src/` prefix inside each zip so handler imports like `from src.shared.models import UARRow` resolve."
 }
 
+variable "evals_root" {
+  type        = string
+  description = "Absolute path to the repo's evals/ directory — ships under an `evals/` prefix inside each zip so handlers (e.g. canary_orchestrator) can read baselines + fixtures from /var/task/evals/."
+}
+
 variable "requirements_path" {
   type        = string
   description = "Absolute path to a requirements.txt listing runtime deps (pydantic, pymssql, strands-agents, ...). boto3 is provided by the Lambda runtime and MUST NOT be listed."
