@@ -1,0 +1,6 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+boundary_admin_0,WINDOWS_LOGIN,2025-03-22 02:37:31,2026-01-25 02:37:31,,appdb (sql01),boundary_admin_0,USER,dbo,db_datareader,False,False,False,False,Admin,,
+boundary_admin_1,WINDOWS_LOGIN,2025-03-22 02:37:31,2026-01-25 02:37:31,,appdb (sql01),boundary_admin_1,USER,dbo,db_datareader,False,False,False,False,Admin,,
+boundary_admin_2,WINDOWS_LOGIN,2025-03-22 02:37:31,2026-01-25 02:37:31,,appdb (sql01),boundary_admin_2,USER,dbo,db_datareader,False,False,False,False,Admin,,
+boundary_admin_3,WINDOWS_LOGIN,2025-03-22 02:37:31,2026-01-25 02:37:31,,appdb (sql01),boundary_admin_3,USER,dbo,db_datareader,False,False,False,False,Admin,,
+boundary_admin_4,WINDOWS_LOGIN,2025-03-22 02:37:31,2026-01-25 02:37:31,,appdb (sql01),boundary_admin_4,USER,dbo,db_datareader,False,False,False,False,Admin,,
