@@ -84,7 +84,8 @@ locals {
     canary_orchestrator = {
       handler = "src.canary_orchestrator.handler.lambda_handler"
       memory  = 512
-      timeout = 120
+      # 3 fixtures × ~3 min/pipeline = 9 min wall time; cap at Lambda's 15min max.
+      timeout = 900
     }
     drift_detector = {
       handler = "src.drift_detector.handler.lambda_handler"
