@@ -172,9 +172,16 @@ resource "aws_dynamodb_table" "canary_results" {
   name         = "${var.name_prefix}-canary-results"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "canary_run_id"
+  # month sort key — handler writes one row per (canary_run_id, baseline-month).
+  # Without it, all 3 baselines collapse into a single row per invocation.
+  range_key = "month"
 
   attribute {
     name = "canary_run_id"
+    type = "S"
+  }
+  attribute {
+    name = "month"
     type = "S"
   }
 
