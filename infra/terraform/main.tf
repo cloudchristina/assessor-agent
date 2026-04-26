@@ -262,3 +262,13 @@ module "eventbridge" {
   canary_orchestrator_arn          = module.lambda_artefacts.function_arns["canary_orchestrator"]
   drift_detector_arn               = module.lambda_artefacts.function_arns["drift_detector"]
 }
+
+module "eval_alarms" {
+  source                    = "./modules/eval_alarms"
+  name_prefix               = local.name_prefix
+  email                     = var.owner_email
+  judge_log_group_name      = "/aws/lambda/${local.name_prefix}-judge"
+  drift_signals_table_name  = module.dynamodb.drift_signals_table_name
+  canary_results_table_name = module.dynamodb.canary_results_table_name
+  tags                      = local.common_tags
+}
