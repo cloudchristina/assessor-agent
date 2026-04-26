@@ -110,59 +110,93 @@
 
 <div id="deck"><div id="stage">
 
-<!-- ============ SLIDE 1 — Hello ============ -->
+<!-- ============ SLIDE 1 — Title ============ -->
 <section class="slide title active" data-slide="1">
   <div class="mark tl"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
-  <h1>Christina Chen</h1>
-  <h2>Senior Consultant — Banking &amp; Finance · Mantel Group</h2>
-  <div class="role">An auditor-grade compliance agent on serverless<br>Serverless Meetup Sydney · April 2026</div>
+  <h1>Compliance Assessor Agent</h1>
+  <h2>Built for IRAP · ISM · APRA CPS 234</h2>
+  <div class="role"><strong style="color:#fff;font-size:26px">Christina Chen</strong><br>Senior Consultant · Mantel Group</div>
   <div class="pageno">01 / 12</div>
-  <aside class="notes" hidden>Two beats of silence after the title appears. Then: "Twenty-five minutes. Live demo. One attempt to break it on stage. Let's go." Press T to start the timer as you say "now".</aside>
+  <aside class="notes" hidden>Two beats of silence after the title appears. Then: "Twenty-five minutes. Live demo. We're going to try to break it on stage." Press T to start the timer as you say "now".</aside>
 </section>
 
-<!-- ============ SLIDE 2 — Why I'm doing this ============ -->
-<section class="slide bignum-slide" data-slide="2">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
-  <div class="label">Why I'm doing this</div>
-  <div class="bignum">3,000</div>
-  <div class="bignum-sub">engineer-hours per Australian bank, per year, on <strong>one</strong> access review report.</div>
-  <p style="margin-top:36px;max-width:1100px">APRA CPS 234 §35 — User Access Review. Today: spreadsheets, screenshots, email threads.<br>
-    A bank told me their last cycle ran <strong>47 reviewers · 11 weeks · one finding missed</strong>.</p>
-  <blockquote style="margin-top:28px">Auditors don't forget missed findings. So I built one that doesn't miss them — and that the auditor can replay.</blockquote>
-  <div class="pageno">02 / 12</div>
-  <aside class="notes" hidden>Hold the number 3,000. Beat. The "47 reviewers / 11 weeks / one finding missed" is the emotional anchor — it is anonymised but real. Don't soften it. The closing italics is your "why" — say it slowly.</aside>
-</section>
+<!-- ============ SLIDE 2 — IRAP / ISM / Why / Cost ============ -->
+<section class="slide" data-slide="2">
+  <h1>IRAP and ISM — what they are, why they matter</h1>
+  <h2>Australia's framework for handling government and regulated data — and the bill that comes with it</h2>
 
-<!-- ============ SLIDE 3 — Today ============ -->
-<section class="slide" data-slide="3">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
-  <h1>Today — three things</h1>
-  <h2>25 minutes · live demo · one attempt to break it on stage</h2>
-  <div class="grid-3">
+  <div class="grid-2" style="margin-top:14px">
     <div class="card">
-      <div class="num">01</div>
-      <h3>Build it on serverless</h3>
-      <p>Six rules · ten Lambdas · zero servers. Pure-Python compliance pipeline auditors can replay row-by-row.</p>
+      <div class="num">IRAP</div>
+      <h3 style="margin-top:8px">Information Security Registered Assessors Program</h3>
+      <p style="font-size:19px;margin-top:6px">Run by the Australian Signals Directorate (ASD). Independent assessors verify that a system meets ISM controls before it can handle <strong>OFFICIAL</strong>, <strong>PROTECTED</strong>, or <strong>SECRET</strong> data.</p>
+      <p style="font-size:18px;margin-top:10px;color:var(--accent-blue)">Required for: any cloud / SaaS handling AU government workloads. Banks rely on equivalent rigour for APRA CPS 234.</p>
     </div>
     <div class="card">
-      <div class="num">02</div>
-      <h3>Let an agent narrate</h3>
-      <p>Strands + Bedrock. <strong>Read-only, four tools, no maths.</strong> The agent writes the story; the rules engine does the counting.</p>
-    </div>
-    <div class="card">
-      <div class="num">03</div>
-      <h3>Stop it lying — provably</h3>
-      <p>Five layers of defence. We'll trigger a prompt injection live and watch the citation gate fire.</p>
+      <div class="num">ISM</div>
+      <h3 style="margin-top:8px">Information Security Manual · ASD</h3>
+      <p style="font-size:19px;margin-top:6px"><strong>1,000+ controls</strong> across six functions: <em>govern · identify · protect · detect · respond · recover</em>. Updated quarterly — latest <strong>March 2026</strong>.</p>
+      <p style="font-size:18px;margin-top:10px;color:var(--accent-blue)">Today's talk hits ISM-1546, 1509, 1555, 1175, 0445, 1545 — the <strong>access-control family</strong>.</p>
     </div>
   </div>
-  <p style="margin-top:36px"><em>What this talk is not:</em> a tour of every AWS service. It's a worked example of <strong>agent-with-guardrails</strong> as a compliance posture.</p>
+
+  <h3 style="margin-top:28px;color:#7BB7E0">What it costs to comply — every cycle</h3>
+  <div class="grid-3" style="margin-top:14px">
+    <div class="card" style="text-align:center">
+      <div class="bignum" style="font-size:64px;color:#E5777E">$40K – $100K+</div>
+      <p style="font-size:17px;margin-top:6px">per IRAP assessment · scales with system complexity</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <div class="bignum" style="font-size:64px;color:#E5777E">6 – 10 weeks</div>
+      <p style="font-size:17px;margin-top:6px">typical assessment duration · 2–6 months for complex systems</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <div class="bignum" style="font-size:64px;color:#E5777E">weeks</div>
+      <p style="font-size:17px;margin-top:6px">of senior internal time per cycle, on top of the assessor fee</p>
+    </div>
+  </div>
+
+  <p style="margin-top:18px;font-size:20px"><em>Sources: ASD cyber.gov.au · CanIComply · 6clicks · ARANKISH (2026 figures).</em></p>
+
+  <div class="pageno">02 / 12</div>
+  <aside class="notes" hidden>Define IRAP and ISM in plain English — most of the audience will know one but not both. Land the cost numbers — $40K-$100K+ per cycle, weeks of senior time. That's the pain we're attacking. Don't get into ISM control numbers; just say "the access-control family" and move on.</aside>
+</section>
+
+<!-- ============ SLIDE 3 — Why agentic ============ -->
+<section class="slide" data-slide="3">
+  <h1>Why agentic — and where the speed-up actually comes from</h1>
+  <h2>Turn weeks of reviewer effort into minutes of attestation, without losing audit trail</h2>
+
+  <div class="grid-3" style="margin-top:14px">
+    <div class="card">
+      <div class="num">Today · manual</div>
+      <h3 style="margin-top:8px">Spreadsheets &amp; email</h3>
+      <p style="font-size:19px">Excel exports per database · joined manually · tickets across 3 systems · sign-off chased over Slack DMs.</p>
+      <p style="font-size:18px;margin-top:12px;color:#E5777E"><strong>47 reviewers · 11 weeks · finding missed</strong></p>
+    </div>
+    <div class="card">
+      <div class="num">With deterministic engine</div>
+      <h3 style="margin-top:8px">Pure Python rules</h3>
+      <p style="font-size:19px">Six rules over the whole estate. Manifest hash for coverage proof. Findings carry their ISM control inline.</p>
+      <p style="font-size:18px;margin-top:12px;color:var(--accent-blue)">≈ <strong>1.3s</strong> rules pass · 100% reproducible</p>
+    </div>
+    <div class="card">
+      <div class="num">+ agentic narrator</div>
+      <h3 style="margin-top:8px">LLM does the writing, not the maths</h3>
+      <p style="font-size:19px">Clusters 200+ findings into themes · drafts remediation language · answers reviewer questions in chat.</p>
+      <p style="font-size:18px;margin-top:12px;color:#7CB342"><strong>30 min</strong> reviewer pass · was 6 hours</p>
+    </div>
+  </div>
+
+  <p style="margin-top:24px;font-size:22px"><strong>The agent reduces effort, not accountability.</strong> A human still confirms every CRITICAL finding. The agent narrates, contextualises, drafts — it never decides.</p>
+  <p style="margin-top:8px;font-size:20px"><em>This talk:</em> 25 minutes · the architecture · the guardrails · live demo · one attempt to make it hallucinate on stage.</p>
+
   <div class="pageno">03 / 12</div>
-  <aside class="notes" hidden>Set expectations. Three cards = three checkpoints in the audience's head. Card 3 is the money one — flag it now so they're waiting for the live break attempt.</aside>
+  <aside class="notes" hidden>Three columns are a journey: today (painful) → engine (fast but cold) → engine + agent (fast and human-readable). The bold paragraph at the bottom is the constraint that makes the agentic approach safe for compliance work — say it slowly. End by setting expectations for the rest of the talk.</aside>
 </section>
 
 <!-- ============ SLIDE 4 — Entire architecture ============ -->
 <section class="slide" data-slide="4">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <h1>Architecture — agent isn't at the centre</h1>
   <h2>EventBridge schedule → 10 Lambdas in Step Functions → DDB + S3 (Object Lock 7y)</h2>
 
@@ -233,7 +267,7 @@
       <text x="60" y="69" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">reconciliation-gate</text>
       <rect y="92" width="120" height="36" rx="8" fill="url(#lambda-grad)"/>
       <text x="60" y="115" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">grounding-gate</text>
-      <text x="60" y="160" text-anchor="middle" fill="#D9E5EC" font-size="11">3 deterministic gates</text>
+      <text x="60" y="160" text-anchor="middle" fill="#D9E5EC" font-size="11">3 runtime guardrails</text>
     </g>
     <line x1="1035" y1="220" x2="1075" y2="220" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr)"/>
 
@@ -274,7 +308,6 @@
 
 <!-- ============ SLIDE 5 — Stage I ============ -->
 <section class="slide" data-slide="5">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="label">Stage I</div>
   <h1>Deterministic foundation — six rules, six Lambdas</h1>
 
@@ -312,7 +345,6 @@
 
 <!-- ============ SLIDE 6 — Stage II why ============ -->
 <section class="slide" data-slide="6">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="label">Stage II</div>
   <h1>The agent layer — and its scope</h1>
 
@@ -350,7 +382,6 @@
 
 <!-- ============ SLIDE 7 — Stage II flow ============ -->
 <section class="slide" data-slide="7">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <h1>Stage II flow — agent + 4 tools + 3 gates + judge</h1>
   <h2>Findings in · NarrativeReport out · every step traceable, every failure quarantines</h2>
 
@@ -451,43 +482,41 @@
   <aside class="notes" hidden>Walk: input (only IDs + summary, never raw rows) → agent + 4 tools (every tool call = one signed span) → NarrativeReport (Pydantic forced via tool-use) → 3 gates run in parallel → judge → Choice. Land: "any single failure quarantines the whole run."</aside>
 </section>
 
-<!-- ============ SLIDE 8 — Prompts & evals ============ -->
+<!-- ============ SLIDE 8 — Guardrails + evals + hallucinations ============ -->
 <section class="slide" data-slide="8">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
-  <h1>How we stop the agent lying — five layers</h1>
-  <h2>Prompts get you so far. Evals get you the rest.</h2>
+  <h1>Guardrails, evals, and managing hallucinations</h1>
+  <h2>Multi-layered defence — the consensus pattern from Anthropic, AWS, and the agent-safety literature</h2>
 
   <div class="stack">
     <div class="layer deployed">
-      <div class="n">L1</div><div class="name">Input constraint</div>
-      <div class="what">Raw rows never reach the model · temp=0 · structured output forced via Bedrock tool-use · no user-controlled strings interpolated</div>
+      <div class="n">L1</div><div class="name">Prompt &amp; input controls</div>
+      <div class="what">Raw rows never reach the model · <code>temp=0</code> · structured output via Bedrock tool-use · agent given <em>"return Unknown"</em> escape hatch (Anthropic eval guidance)</div>
     </div>
     <div class="layer deployed">
-      <div class="n">L2</div><div class="name">Hard runtime gates</div>
-      <div class="what">4 Lambdas: <strong>schema · citation · reconciliation · entity-grounding</strong> · pure Python · 100ms total · $0/run</div>
+      <div class="n">L2</div><div class="name">Runtime guardrails</div>
+      <div class="what">4 deterministic Lambdas: <strong>schema · citation · reconciliation · entity-grounding</strong> · &lt;100ms · $0/run · runs after every agent call</div>
     </div>
     <div class="layer deployed">
       <div class="n">L3</div><div class="name">Cross-model validation</div>
-      <div class="what">Haiku 4.5 LLM-as-judge · adversarial probe · self-consistency on CRITICAL findings — different model family from the generator</div>
+      <div class="what">Haiku 4.5 <strong>LLM-as-judge</strong> · adversarial probe · self-consistency on CRITICAL findings · second-opinion model from a different family</div>
     </div>
     <div class="layer">
-      <div class="n">L4</div><div class="name">Offline evals (CI gate)</div>
-      <div class="what">Golden + adversarial + counterfactual + Hypothesis property tests — block merge on regression — <em>in flight (Plan 2)</em></div>
+      <div class="n">L4</div><div class="name">Offline evals (CI)</div>
+      <div class="what">Golden set · adversarial set · counterfactual diffs · Hypothesis property tests · <strong>blocks merge on regression</strong> — <em>in flight (Plan 2)</em></div>
     </div>
     <div class="layer">
-      <div class="n">L5</div><div class="name">Production drift</div>
-      <div class="what">Shadow evals · reviewer-disagreement loop · weekly KS test · circuit breaker — <em>post-MVP</em></div>
+      <div class="n">L5</div><div class="name">Production drift detection</div>
+      <div class="what">Shadow evals on 5% of prod runs · reviewer-disagreement loop · weekly KS test on finding distribution · circuit breaker — <em>post-MVP</em></div>
     </div>
   </div>
 
-  <p style="margin-top:18px">Coral border = <strong>deployed today</strong>. Blue border = <em>roadmap</em>. The prompt-injection demo will hit <strong>L2 citation-gate</strong> live.</p>
+  <p style="margin-top:18px">Coral border = <strong>deployed today</strong>. Blue border = <em>roadmap</em>. The live prompt-injection attempt will trip <strong>L2 citation-guardrail</strong> — you'll see it fire on stage.</p>
   <div class="pageno">08 / 12</div>
-  <aside class="notes" hidden>"We can't make the agent never wrong. We can make it provably bounded." After demo 2 (prompt injection), point at L2 specifically — "that's what fired". L4 is what ships next. L5 is what you build after a year of production data.</aside>
+  <aside class="notes" hidden>Use the proper terms: "guardrails" for runtime intervention layer (Anthropic + Bedrock convention), "evals" for offline graded tests (Anthropic), "hallucinations" for the failure mode. Anthropic's guidance — give the LLM a way out (return Unknown) — is on L1. AWS Bedrock's Automated Reasoning + Guardrails sit conceptually at L2/L3. Land: "no single layer prevents hallucinations; the multi-layer pattern is the consensus answer right now."</aside>
 </section>
 
 <!-- ============ SLIDE 9 — Tracing ============ -->
 <section class="slide" data-slide="9">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <h1>Tracing — every tool call is a signed span</h1>
   <h2>One env var unlocks all of this. <code>STRANDS_TELEMETRY_ENABLED=true</code> → ADOT layer → X-Ray.</h2>
 
@@ -566,7 +595,6 @@
 
 <!-- ============ SLIDE 10 — Summary ============ -->
 <section class="slide" data-slide="10">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="label">Recap</div>
   <h1>Posture, not a demo</h1>
 
@@ -579,7 +607,7 @@
     <div class="card">
       <div class="num">Stage II</div>
       <h3 style="margin-top:8px">Agent + guardrails</h3>
-      <p style="font-size:20px;margin-top:8px">Strands · 4 read-only tools · 5 layers of defence · OTel-native. Quarantines on any gate fail.</p>
+      <p style="font-size:20px;margin-top:8px">Strands · 4 read-only tools · 5-layer guardrails + evals stack · OTel-native. Quarantines on any guardrail fail.</p>
     </div>
   </div>
 
@@ -629,7 +657,6 @@
 
 <!-- ============ SLIDE 12 — Backup ============ -->
 <section class="slide" data-slide="12">
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="label">Backup · for Q&amp;A only</div>
   <h1>The six rules in one frame</h1>
 
