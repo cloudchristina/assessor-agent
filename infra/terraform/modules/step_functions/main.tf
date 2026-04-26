@@ -16,6 +16,7 @@ locals {
     judge_arn                 = var.lambda_arns["judge"]
     publish_triage_arn        = var.lambda_arns["publish_triage"]
     generate_pdf_arn          = var.lambda_arns["generate_pdf"]
+    adversarial_probe_arn     = var.lambda_arns["adversarial_probe"]
   })
 }
 

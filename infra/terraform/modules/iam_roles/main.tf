@@ -54,6 +54,7 @@ locals {
     "judge",
     "publish_triage",
     "generate_pdf",
+    "adversarial_probe",
   ]
 }
 
@@ -329,6 +330,31 @@ resource "aws_iam_role_policy" "generate_pdf" {
   name   = "generate-pdf"
   role   = aws_iam_role.lambda["generate_pdf"].id
   policy = data.aws_iam_policy_document.generate_pdf.json
+}
+
+# ---------------- adversarial-probe ----------------
+data "aws_iam_policy_document" "adversarial_probe" {
+  statement {
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
+    resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${var.runs_bucket_arn}/narratives/*", "${var.runs_bucket_arn}/rules/*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [var.kms_findings_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "adversarial_probe" {
+  name   = "adversarial-probe"
+  role   = aws_iam_role.lambda["adversarial_probe"].id
+  policy = data.aws_iam_policy_document.adversarial_probe.json
 }
 
 # ---------------- step-functions ----------------

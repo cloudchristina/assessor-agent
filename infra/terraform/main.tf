@@ -65,6 +65,11 @@ locals {
       memory  = 1024
       timeout = 60
     }
+    adversarial_probe = {
+      handler = "src.adversarial_probe.handler.lambda_handler"
+      memory  = 1024
+      timeout = 60
+    }
   }
 }
 
@@ -129,7 +134,7 @@ module "lambda_artefacts" {
       # to Lambdas where Strands emits tool/model OTel spans we want to see in
       # X-Ray. Layer ARN is a sourceable AWS-managed layer; pin via
       # var.adot_python_layer_arn.
-      layers = contains(["agent_narrator", "judge"], k) ? [var.adot_python_layer_arn] : []
+      layers = contains(["agent_narrator", "judge", "adversarial_probe"], k) ? [var.adot_python_layer_arn] : []
       env = merge(
         {
           POWERTOOLS_SERVICE_NAME = k
@@ -152,9 +157,9 @@ module "lambda_artefacts" {
         # wrapper and configure the OTel SDK manually in src/shared/otel_init.py
         # using the zip's 1.41 SDK + an OTLP HTTP exporter targeting the ADOT
         # collector sidecar (still attached via the layer, listening on 4318).
-        contains(["agent_narrator", "judge"], k) ? {
-          OTEL_SERVICE_NAME                  = k
-          OTEL_RESOURCE_ATTRIBUTES           = "service.name=${k},service.namespace=assessor-agent"
+        contains(["agent_narrator", "judge", "adversarial_probe"], k) ? {
+          OTEL_SERVICE_NAME        = k
+          OTEL_RESOURCE_ATTRIBUTES = "service.name=${k},service.namespace=assessor-agent"
           # NOTE: TRACES_ENDPOINT is the FULL URL — exporter does not append
           # `/v1/traces`. Using the path-less OTEL_EXPORTER_OTLP_ENDPOINT
           # would cause a 404 because the exporter appends `/v1/traces`,
@@ -174,6 +179,9 @@ module "lambda_artefacts" {
         } : {},
         k == "judge" ? {
           JUDGE_MODEL_ID = "au.anthropic.claude-haiku-4-5-20251001-v1:0"
+        } : {},
+        k == "adversarial_probe" ? {
+          BEDROCK_MODEL_ID = "au.anthropic.claude-haiku-4-5-20251001-v1:0"
         } : {},
       )
     }
