@@ -1,7 +1,9 @@
 """Pydantic v2 boundary models — all I/O contracts in one place."""
 from __future__ import annotations
+
 from datetime import datetime
 from typing import Any, Literal
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -104,3 +106,21 @@ class TriageDecision(BaseModel):
     decision: Literal["confirmed_risk", "false_positive", "accepted_exception", "escalated"]
     rationale: str
     decided_at: datetime
+
+
+class ExpectedFinding(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    rule_id: Literal["R1", "R2", "R3", "R4", "R5", "R6"]
+    principal: str
+    severity: Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+
+
+class GoldenCase(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    case_id: str
+    input_csv: str
+    expected_findings: list[ExpectedFinding]
+    expected_counts: dict[str, int]
+    must_mention: list[str]
+    must_not_mention: list[str]
+    notes: str | None = None
