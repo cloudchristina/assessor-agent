@@ -58,9 +58,14 @@
   ul li{margin:8px 0}
   .tag{color:var(--accent-blue);font-size:20px;letter-spacing:.04em}
   .label{color:var(--accent-coral);font-size:18px;text-transform:uppercase;letter-spacing:.18em;font-weight:600;margin-bottom:18px}
-  .slide.title h1{font-size:96px;margin-top:60px}
-  .slide.title h2{font-size:36px;font-weight:400;margin-top:20px}
-  .slide.title .role{margin-top:auto;color:var(--accent-blue);font-size:22px}
+  .slide.title{justify-content:center;align-items:flex-start;padding-left:120px}
+  .slide.title .hero{max-width:1320px}
+  .slide.title h1{font-size:104px;margin-bottom:14px;line-height:1}
+  .slide.title h2{font-size:34px;color:var(--accent-blue);font-weight:400;margin-bottom:50px}
+  .slide.title .byline{font-size:22px;color:var(--ink-muted);line-height:1.5}
+  .slide.title .byline strong{color:#fff;font-size:26px;font-weight:700}
+  .slide.title .mark.tl img{height:46px}
+  .slide.title .mark.tl span{font-size:30px}
   .bignum{font-size:240px;font-weight:800;line-height:1;color:#fff;letter-spacing:-.04em}
   .bignum-sub{font-size:34px;color:var(--accent-blue);max-width:1100px;margin-top:24px}
   .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:24px}
@@ -112,10 +117,15 @@
 
 <!-- ============ SLIDE 1 — Title ============ -->
 <section class="slide title active" data-slide="1">
-  <h1>Compliance Assessor Agent</h1>
-  <h2>Built for IRAP · ISM · APRA CPS 234</h2>
-  <div class="role"><strong style="color:#fff;font-size:26px">Christina Chen</strong><br>Senior Consultant · Banking &amp; Finance</div>
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <div class="mark tl"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <div class="hero">
+    <h1>Compliance Assessor Agent</h1>
+    <h2>Built for IRAP · ISM · APRA CPS 234</h2>
+    <div class="byline">
+      <strong>Christina Chen</strong><br>
+      Senior Consultant · Banking &amp; Finance
+    </div>
+  </div>
   <div class="pageno">01 / 12</div>
   <aside class="notes" hidden>Two beats of silence after the title appears. Then: "Twenty-five minutes. Live demo. We're going to try to break it on stage." Press T to start the timer as you say "now".</aside>
 </section>
@@ -158,7 +168,6 @@
 
   <p style="margin-top:18px;font-size:20px"><em>Sources: ASD cyber.gov.au · CanIComply · 6clicks · ARANKISH (2026 figures).</em></p>
 
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">02 / 12</div>
   <aside class="notes" hidden>Define IRAP and ISM in plain English — most of the audience will know one but not both. Land the cost numbers — $40K-$100K+ per cycle, weeks of senior time. That's the pain we're attacking. Don't get into ISM control numbers; just say "the access-control family" and move on.</aside>
 </section>
@@ -192,7 +201,6 @@
   <p style="margin-top:24px;font-size:22px"><strong>The agent reduces effort, not accountability.</strong> A human still confirms every CRITICAL finding. The agent narrates, contextualises, drafts — it never decides.</p>
   <p style="margin-top:8px;font-size:20px"><em>This talk:</em> 25 minutes · the architecture · the guardrails · live demo · one attempt to make it hallucinate on stage.</p>
 
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">03 / 12</div>
   <aside class="notes" hidden>Three columns are a journey: today (painful) → engine (fast but cold) → engine + agent (fast and human-readable). The bold paragraph at the bottom is the constraint that makes the agentic approach safe for compliance work — say it slowly. End by setting expectations for the rest of the talk.</aside>
 </section>
@@ -304,7 +312,6 @@
   </svg>
 
   <p style="margin-top:8px"><em>Notice the agent is on the right of the chain — not at the centre.</em> The rules engine does the maths; the agent only writes the story.</p>
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">04 / 12</div>
   <aside class="notes" hidden>Walk LEFT-to-RIGHT. Pause at rules-engine ("deterministic, pure Python, no LLM"). Pause at agent-narrator ("Strands, Bedrock Sonnet, 4 read-only tools"). Pause at the 3 gates ("any failure → quarantine"). Land: "agent isn't at the centre — that's the choice that makes this auditable."</aside>
 </section>
@@ -342,7 +349,6 @@
       </div>
     </div>
   </div>
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">05 / 12</div>
   <aside class="notes" hidden>"The boring half. We do this on purpose. Once it works deterministically, then — and only then — do we let an agent near it." Spend most time on the right column; the left is recap.</aside>
 </section>
@@ -380,7 +386,6 @@
 
   <p style="margin-top:24px;font-size:22px"><strong>Scope:</strong> the agent is a <em>read-only narrator over deterministic findings</em>. It cannot count, vote, assign severity, or mutate state. Adding a tool is an architecture decision, not a commit.</p>
 
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">06 / 12</div>
   <aside class="notes" hidden>Don't bash LangChain — "great framework, just heavier than we need". Land the OTel-native row hard. The bottom paragraph is THE constraint statement; deliver it cleanly.</aside>
 </section>
@@ -483,7 +488,6 @@
     <text x="1330" y="310" fill="#E5777E" font-size="12" font-weight="700">no · QUARANTINE</text>
   </svg>
 
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">07 / 12</div>
   <aside class="notes" hidden>Walk: input (only IDs + summary, never raw rows) → agent + 4 tools (every tool call = one signed span) → NarrativeReport (Pydantic forced via tool-use) → 3 gates run in parallel → judge → Choice. Land: "any single failure quarantines the whole run."</aside>
 </section>
@@ -517,7 +521,6 @@
   </div>
 
   <p style="margin-top:18px">Coral border = <strong>deployed today</strong>. Blue border = <em>roadmap</em>. The live prompt-injection attempt will trip <strong>L2 citation-guardrail</strong> — you'll see it fire on stage.</p>
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">08 / 12</div>
   <aside class="notes" hidden>Use the proper terms: "guardrails" for runtime intervention layer (Anthropic + Bedrock convention), "evals" for offline graded tests (Anthropic), "hallucinations" for the failure mode. Anthropic's guidance — give the LLM a way out (return Unknown) — is on L1. AWS Bedrock's Automated Reasoning + Guardrails sit conceptually at L2/L3. Land: "no single layer prevents hallucinations; the multi-layer pattern is the consensus answer right now."</aside>
 </section>
@@ -596,7 +599,6 @@
     </div>
   </div>
 
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">09 / 12</div>
   <aside class="notes" hidden>Point at the bedrock.invoke span — token counts are the litmus test for whether OTel is actually wired. Pause on "no manual instrumentation" — that's the line for the AWS-architects in the audience.</aside>
 </section>
@@ -636,7 +638,6 @@
 
   <blockquote style="margin-top:30px"><strong>Rules engine = prosecutor. Agent = barrister. Reviewer = judge.</strong> That's the shape.</blockquote>
 
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">10 / 12</div>
   <aside class="notes" hidden>Slow down. Three numbers ($5 / 75s / 7y) land hardest. Then the prosecutor / barrister / judge line — pause after, then "Questions?"</aside>
 </section>
@@ -659,7 +660,6 @@
     <div class="card"><p>The Plan 2 eval suite (50-case golden, in flight)</p></div>
   </div>
 
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">11 / 12</div>
   <aside class="notes" hidden>Q&A slide stays up ~3-4 min. If asked anything you can't answer: "Great question — I'll follow up by email." Hand out card. Never bluff in front of regulators-in-the-audience.</aside>
 </section>
@@ -711,7 +711,6 @@
 
   <p style="margin-top:24px"><em>Thresholds (90d, regex pattern, etc.) configurable via DDB <code>rule_config</code> in production.</em></p>
 
-  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
   <div class="pageno">12 / 12</div>
   <aside class="notes" hidden>Use only if asked "what are the actual rules?". Not part of the main flow.</aside>
 </section>
