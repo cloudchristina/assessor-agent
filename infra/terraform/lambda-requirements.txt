@@ -4,3 +4,4 @@ pymssql>=2.3
 strands-agents[otel]>=1.0
 reportlab>=4.0
 tenacity>=9.0
+scipy>=1.13
