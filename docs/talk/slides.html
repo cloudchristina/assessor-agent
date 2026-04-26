@@ -60,10 +60,10 @@
   .label{color:var(--accent-coral);font-size:18px;text-transform:uppercase;letter-spacing:.18em;font-weight:600;margin-bottom:18px}
   .slide.title{justify-content:center;align-items:flex-start;padding-left:120px}
   .slide.title .hero{max-width:1320px}
-  .slide.title h1{font-size:104px;margin-bottom:14px;line-height:1}
-  .slide.title h2{font-size:34px;color:var(--accent-blue);font-weight:400;margin-bottom:50px}
-  .slide.title .byline{font-size:22px;color:var(--ink-muted);line-height:1.5}
-  .slide.title .byline strong{color:#fff;font-size:26px;font-weight:700}
+  .slide.title h1{font-size:80px;margin-bottom:16px;line-height:1.05}
+  .slide.title h2{font-size:30px;color:var(--accent-blue);font-weight:400;margin-bottom:48px}
+  .slide.title .byline{font-size:20px;color:var(--ink-muted);line-height:1.5}
+  .slide.title .byline strong{color:#fff;font-size:24px;font-weight:700}
   .slide.title .mark.tl img{height:46px}
   .slide.title .mark.tl span{font-size:30px}
   .bignum{font-size:240px;font-weight:800;line-height:1;color:#fff;letter-spacing:-.04em}
@@ -130,46 +130,35 @@
   <aside class="notes" hidden>Two beats of silence after the title appears. Then: "Twenty-five minutes. Live demo. We're going to try to break it on stage." Press T to start the timer as you say "now".</aside>
 </section>
 
-<!-- ============ SLIDE 2 — IRAP / ISM / Why / Cost ============ -->
+<!-- ============ SLIDE 2 — IRAP / ISM / Cost ============ -->
 <section class="slide" data-slide="2">
-  <h1>IRAP and ISM — what they are, why they matter</h1>
-  <h2>Australia's framework for handling government and regulated data — and the bill that comes with it</h2>
+  <h1>IRAP &amp; ISM — and the bill</h1>
+  <h2>Australia's framework for systems handling regulated data</h2>
 
-  <div class="grid-2" style="margin-top:14px">
-    <div class="card">
-      <div class="num">IRAP</div>
-      <h3 style="margin-top:8px">Information Security Registered Assessors Program</h3>
-      <p style="font-size:19px;margin-top:6px">Run by the Australian Signals Directorate (ASD). Independent assessors verify that a system meets ISM controls before it can handle <strong>OFFICIAL</strong>, <strong>PROTECTED</strong>, or <strong>SECRET</strong> data.</p>
-      <p style="font-size:18px;margin-top:10px;color:var(--accent-blue)">Required for: any cloud / SaaS handling AU government workloads. Banks rely on equivalent rigour for APRA CPS 234.</p>
+  <div style="margin-top:36px;font-size:24px;line-height:1.7;color:var(--ink-muted);max-width:1300px">
+    <p><strong style="color:#fff">IRAP</strong> &nbsp;·&nbsp; independent assessors verify a system meets the ISM <em>before</em> it can handle <strong>PROTECTED</strong> data.</p>
+    <p style="margin-top:10px"><strong style="color:#fff">ISM</strong> &nbsp;·&nbsp; <strong>1,000+ controls</strong> · six functions · maintained by ASD · latest <strong>March 2026</strong>.</p>
+  </div>
+
+  <div class="grid-3" style="margin-top:50px">
+    <div class="card" style="text-align:center;padding:32px 20px">
+      <div style="font-size:56px;font-weight:800;color:#E5777E;line-height:1">$40K – $100K+</div>
+      <p style="font-size:18px;margin-top:10px">per assessment</p>
     </div>
-    <div class="card">
-      <div class="num">ISM</div>
-      <h3 style="margin-top:8px">Information Security Manual · ASD</h3>
-      <p style="font-size:19px;margin-top:6px"><strong>1,000+ controls</strong> across six functions: <em>govern · identify · protect · detect · respond · recover</em>. Updated quarterly — latest <strong>March 2026</strong>.</p>
-      <p style="font-size:18px;margin-top:10px;color:var(--accent-blue)">Today's talk hits ISM-1546, 1509, 1555, 1175, 0445, 1545 — the <strong>access-control family</strong>.</p>
+    <div class="card" style="text-align:center;padding:32px 20px">
+      <div style="font-size:56px;font-weight:800;color:#E5777E;line-height:1">6 – 10 weeks</div>
+      <p style="font-size:18px;margin-top:10px">typical duration</p>
+    </div>
+    <div class="card" style="text-align:center;padding:32px 20px">
+      <div style="font-size:56px;font-weight:800;color:#E5777E;line-height:1">weeks</div>
+      <p style="font-size:18px;margin-top:10px">of senior internal time, every cycle</p>
     </div>
   </div>
 
-  <h3 style="margin-top:28px;color:#7BB7E0">What it costs to comply — every cycle</h3>
-  <div class="grid-3" style="margin-top:14px">
-    <div class="card" style="text-align:center">
-      <div class="bignum" style="font-size:64px;color:#E5777E">$40K – $100K+</div>
-      <p style="font-size:17px;margin-top:6px">per IRAP assessment · scales with system complexity</p>
-    </div>
-    <div class="card" style="text-align:center">
-      <div class="bignum" style="font-size:64px;color:#E5777E">6 – 10 weeks</div>
-      <p style="font-size:17px;margin-top:6px">typical assessment duration · 2–6 months for complex systems</p>
-    </div>
-    <div class="card" style="text-align:center">
-      <div class="bignum" style="font-size:64px;color:#E5777E">weeks</div>
-      <p style="font-size:17px;margin-top:6px">of senior internal time per cycle, on top of the assessor fee</p>
-    </div>
-  </div>
-
-  <p style="margin-top:18px;font-size:20px"><em>Sources: ASD cyber.gov.au · CanIComply · 6clicks · ARANKISH (2026 figures).</em></p>
+  <p style="margin-top:36px;font-size:22px"><em>Repeated every cycle, on every system. That's the cost we're attacking.</em></p>
 
   <div class="pageno">02 / 12</div>
-  <aside class="notes" hidden>Define IRAP and ISM in plain English — most of the audience will know one but not both. Land the cost numbers — $40K-$100K+ per cycle, weeks of senior time. That's the pain we're attacking. Don't get into ISM control numbers; just say "the access-control family" and move on.</aside>
+  <aside class="notes" hidden>Define IRAP and ISM in one breath each. Spend the most time on the three cost numbers — these are the punchline. Sources (in case asked): cyber.gov.au, CanIComply, 6clicks, ARANKISH (2026 figures). The "access-control family" of ISM controls (1546, 1509, 1555, 1175, 0445, 1545) shows up later on the architecture slide; don't enumerate them here.</aside>
 </section>
 
 <!-- ============ SLIDE 3 — Why agentic ============ -->
