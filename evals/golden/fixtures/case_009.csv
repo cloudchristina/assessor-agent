@@ -1,0 +1,5 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+svc_app_alpha,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-22 00:00:00,,appdb (sql01),shared_svc_user,USER,dbo,db_datareader,False,False,False,False,ReadOnly,,
+svc_app_beta,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-22 00:00:00,,appdb (sql01),shared_svc_user,USER,dbo,db_datareader,False,False,False,False,ReadOnly,,
+normal_user_01,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-15 00:00:00,,appdb (sql01),normal_user_01,USER,dbo,db_datareader,False,False,False,False,ReadOnly,,
+normal_user_02,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-18 00:00:00,,appdb (sql01),normal_user_02,USER,dbo,db_datareader,False,False,False,False,ReadOnly,,
