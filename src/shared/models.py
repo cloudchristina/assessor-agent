@@ -88,6 +88,10 @@ class NarrativeReport(BaseModel):
     total_findings: int
     model_id: str
     generated_at: datetime
+    # True when no CRITICAL findings exist or when all 3 self-consistency runs agree.
+    # False when the agent produced divergent citations across re-runs.
+    # Defaults to True so existing callers (JSON from S3 without this key) are unaffected.
+    self_consistency_passed: bool = True
 
 
 class JudgeScore(BaseModel):

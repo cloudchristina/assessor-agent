@@ -35,12 +35,20 @@ def lambda_handler(event: dict, _ctx: object) -> dict:
         "controls": sorted(found["controls"] - truth_controls),
     }
     false_negations = check_negations(text_blob, findings)
-    passed = not any(ungrounded.values()) and not false_negations
-    log.info("grounding.gate", extra={"passed": passed})
+    # Consume the self-consistency flag written by agent_narrator.
+    # Absent key defaults to True (no self-consistency check ran or check passed).
+    self_consistency_passed = narrative.get("self_consistency_passed", True)
+    passed = (
+        not any(ungrounded.values())
+        and not false_negations
+        and self_consistency_passed
+    )
+    log.info("grounding.gate", extra={"passed": passed, "self_consistency_passed": self_consistency_passed})
     return {
         "gate": "entity_grounding",
         "passed": passed,
         "passed_int": 1 if passed else 0,
         "ungrounded_entities": ungrounded,
         "false_negations": false_negations,
+        "self_consistency_failed": not self_consistency_passed,
     }
