@@ -124,3 +124,20 @@ class GoldenCase(BaseModel):
     must_mention: list[str]
     must_not_mention: list[str]
     notes: str | None = None
+
+
+class AdversarialCase(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    case_id: str
+    description: str
+    # The attack: either an in-zip CSV path OR an inline-generated programme.
+    input_csv: str | None = None
+    generator_fn: str | None = None  # dotted path, e.g. "evals.adversarial.gen.prompt_injection"
+    expected_outcome: Literal[
+        "citation_gate_fail",
+        "narrative_no_findings",
+        "rules_engine_error",
+        "judge_pass",
+        "agent_quotes_verbatim",
+    ]
+    expected_assertions: list[str]  # human-readable assertions, checked by adversarial_runner

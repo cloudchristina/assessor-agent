@@ -1,0 +1,3 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+inactive_89d,SQL_LOGIN,2023-01-01 00:00:00,2026-01-27 00:00:00,sysadmin,appdb (sql01),inactive_89d,USER,dbo,db_owner,False,False,False,True,Admin,,
+inactive_90d,SQL_LOGIN,2023-01-01 00:00:00,2026-01-26 00:00:00,sysadmin,appdb (sql01),inactive_90d,USER,dbo,db_owner,False,False,False,True,Admin,,

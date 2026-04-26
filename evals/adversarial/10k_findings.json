@@ -1,0 +1,13 @@
+{
+  "case_id": "10k_findings",
+  "description": "Synthetic 10 000-row extract to stress-test token budget and citation gate at scale",
+  "input_csv": null,
+  "generator_fn": "evals.adversarial.fixtures.10k_findings_gen.generate",
+  "expected_outcome": "judge_pass",
+  "expected_assertions": [
+    "Rules engine processes all 10 000 rows without error",
+    "Narrative does not exceed Bedrock context limit",
+    "Citation gate passes (all cited finding_ids exist in rules engine output)",
+    "judge.faithfulness >= 0.8"
+  ]
+}

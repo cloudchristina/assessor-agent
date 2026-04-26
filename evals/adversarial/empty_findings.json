@@ -1,0 +1,12 @@
+{
+  "case_id": "empty_findings",
+  "description": "Extract CSV has zero data rows — rules engine should produce zero findings",
+  "input_csv": "evals/adversarial/fixtures/empty_findings.csv",
+  "expected_outcome": "narrative_no_findings",
+  "expected_assertions": [
+    "Rules engine returns 0 findings",
+    "Narrative acknowledges no findings were detected",
+    "Citation gate passes trivially (nothing to cite)",
+    "judge.passed is True"
+  ]
+}

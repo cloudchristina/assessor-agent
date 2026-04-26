@@ -1,0 +1,12 @@
+{
+  "case_id": "boundary_89d_vs_90d",
+  "description": "One login inactive for 89 days (should NOT trigger R2) and one for 90 days (should trigger R2)",
+  "input_csv": "evals/adversarial/fixtures/boundary_89d_vs_90d.csv",
+  "expected_outcome": "judge_pass",
+  "expected_assertions": [
+    "Rules engine fires R2 for the 90-day login only",
+    "Rules engine does NOT fire R2 for the 89-day login",
+    "Exactly 1 finding with rule_id R2",
+    "Citation gate passes"
+  ]
+}

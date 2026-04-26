@@ -1,0 +1,2 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+evil_user,SQL_LOGIN,2024-03-01 00:00:00,2026-04-20 08:00:00,sysadmin,appdb (sql01),evil_user,USER,"; DROP TABLE findings; --",db_owner,False,False,False,True,Admin,SELECT=1,
