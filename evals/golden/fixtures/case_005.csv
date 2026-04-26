@@ -1,0 +1,9 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+svc_batch,SQL_LOGIN,2024-03-01 00:00:00,2026-04-25 08:00:00,sysadmin,payroll_prod (sql01),svc_batch,USER,dbo,db_owner,False,False,False,True,Admin,SELECT=1,
+dead_dba,WINDOWS_LOGIN,2024-01-01 00:00:00,,sysadmin,corebank_prod (sql01),dead_dba,USER,dbo,db_owner,False,False,False,False,Admin,,
+cross_dev,WINDOWS_LOGIN,2025-01-15 00:00:00,2026-04-24 09:00:00,,appdb_dev (sql01),cross_dev,USER,dbo,db_owner,False,False,False,False,Admin,,
+cross_dev,WINDOWS_LOGIN,2025-01-15 00:00:00,2026-04-24 09:00:00,,appdb_prod (sql01),cross_dev,USER,dbo,db_owner,False,False,False,False,Admin,,
+ghost_login,WINDOWS_LOGIN,2025-06-01 00:00:00,2026-04-20 11:00:00,,reportdb (sql01),,,,,False,False,False,False,Unknown,,
+frank_explicit,WINDOWS_LOGIN,2025-09-01 00:00:00,2026-04-23 14:00:00,,financedb (sql01),frank_explicit,USER,finance,,False,True,False,False,Write,INSERT=1,
+admin,WINDOWS_LOGIN,2024-05-01 00:00:00,2026-04-22 10:00:00,,appdb (sql01),admin,USER,dbo,db_datareader,False,False,False,False,ReadOnly,SELECT=1,
+alice_readonly,WINDOWS_LOGIN,2025-02-01 00:00:00,2026-04-25 09:00:00,,reportdb (sql01),alice_readonly,USER,dbo,db_datareader,False,False,False,False,ReadOnly,SELECT=1,
