@@ -1,0 +1,6 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+acme_vendor_1,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-24 12:00:00,,vendordb_1 (sql02),,,,,False,False,False,False,Unknown,,
+acme_vendor_2,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-24 12:00:00,,vendordb_2 (sql02),,,,,False,False,False,False,Unknown,,
+acme_vendor_3,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-24 12:00:00,,vendordb_3 (sql02),,,,,False,False,False,False,Unknown,,
+acme_vendor_4,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-24 12:00:00,,vendordb_4 (sql02),,,,,False,False,False,False,Unknown,,
+acme_vendor_5,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-24 12:00:00,,vendordb_5 (sql02),,,,,False,False,False,False,Unknown,,
