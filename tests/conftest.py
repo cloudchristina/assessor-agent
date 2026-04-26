@@ -4,9 +4,13 @@ import os
 
 import pytest
 
-os.environ.setdefault("AWS_ACCESS_KEY_ID", "testing")
-os.environ.setdefault("AWS_SECRET_ACCESS_KEY", "testing")
-os.environ.setdefault("AWS_SESSION_TOKEN", "testing")
+# Integration tests opt out of moto's dummy creds so boto3 can resolve the
+# real SSO profile credentials (AWS_PROFILE) — env-var creds otherwise shadow
+# the profile in boto3's resolution chain.
+if os.environ.get("RUN_INTEGRATION_TESTS") != "1":
+    os.environ.setdefault("AWS_ACCESS_KEY_ID", "testing")
+    os.environ.setdefault("AWS_SECRET_ACCESS_KEY", "testing")
+    os.environ.setdefault("AWS_SESSION_TOKEN", "testing")
 os.environ.setdefault("AWS_DEFAULT_REGION", "ap-southeast-2")
 
 
