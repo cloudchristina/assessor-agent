@@ -1,0 +1,22 @@
+{
+  "month": "2025-12",
+  "fixture": "evals/canary/fixtures/month_2025-12.csv",
+  "expected_metrics": {
+    "total_findings": 3,
+    "per_rule_counts": {
+      "R1": 0,
+      "R2": 1,
+      "R3": 0,
+      "R4": 0,
+      "R5": 1,
+      "R6": 1
+    },
+    "judge_faithfulness": 0.9,
+    "judge_completeness": 0.9
+  },
+  "tolerance": {
+    "judge_faithfulness": 0.05,
+    "judge_completeness": 0.05
+  },
+  "notes": "Baseline established 2026-04-26 by scripts/generate_canary_baseline.py. judge_faithfulness and judge_completeness are PLACEHOLDERS (0.90) because live judge scores require AWS Bedrock. Re-run generate_canary_baseline.py --update-judge after a live deploy to replace placeholders with real values."
+}
