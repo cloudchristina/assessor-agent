@@ -65,3 +65,41 @@ resource "aws_scheduler_schedule" "monthly" {
     })
   }
 }
+
+# ---------------------------------------------------------------------------
+# Reviewer-disagreement digest — Sunday 04:00 AEST (18:00 UTC Saturday)
+# Runs after the canary + drift-detector have completed.
+# ---------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "scheduler_digest_invoke" {
+  statement {
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [var.reviewer_disagreement_digest_arn]
+  }
+}
+
+resource "aws_iam_role" "scheduler_digest" {
+  name               = "${var.name_prefix}-scheduler-digest"
+  assume_role_policy = data.aws_iam_policy_document.scheduler_assume.json
+}
+
+resource "aws_iam_role_policy" "scheduler_digest" {
+  name   = "invoke-digest-lambda"
+  role   = aws_iam_role.scheduler_digest.id
+  policy = data.aws_iam_policy_document.scheduler_digest_invoke.json
+}
+
+resource "aws_scheduler_schedule" "reviewer_digest" {
+  name                = "${var.name_prefix}-reviewer-digest"
+  schedule_expression = "cron(0 18 ? * SUN *)" # 04:00 AEST = 18:00 UTC Saturday
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  target {
+    arn      = var.reviewer_disagreement_digest_arn
+    role_arn = aws_iam_role.scheduler_digest.arn
+  }
+}

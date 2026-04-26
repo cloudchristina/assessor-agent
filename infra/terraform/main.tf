@@ -70,6 +70,11 @@ locals {
       memory  = 1024
       timeout = 60
     }
+    reviewer_disagreement_digest = {
+      handler = "src.reviewer_disagreement_digest.handler.lambda_handler"
+      memory  = 512
+      timeout = 60
+    }
   }
 }
 
@@ -183,6 +188,11 @@ module "lambda_artefacts" {
         k == "adversarial_probe" ? {
           BEDROCK_MODEL_ID = "au.anthropic.claude-haiku-4-5-20251001-v1:0"
         } : {},
+        k == "reviewer_disagreement_digest" ? {
+          GOLDEN_SET_CANDIDATES_TABLE = "${local.name_prefix}-golden-set-candidates"
+          DIGEST_FROM                 = var.owner_email
+          COMPLIANCE_EMAIL            = var.owner_email
+        } : {},
       )
     }
   }
@@ -197,9 +207,10 @@ module "step_functions" {
 }
 
 module "eventbridge" {
-  source            = "./modules/eventbridge"
-  name_prefix       = local.name_prefix
-  state_machine_arn = module.step_functions.state_machine_arn
-  weekly_cron       = var.weekly_cron
-  monthly_cron      = var.monthly_cron
+  source                           = "./modules/eventbridge"
+  name_prefix                      = local.name_prefix
+  state_machine_arn                = module.step_functions.state_machine_arn
+  weekly_cron                      = var.weekly_cron
+  monthly_cron                     = var.monthly_cron
+  reviewer_disagreement_digest_arn = module.lambda_artefacts.function_arns["reviewer_disagreement_digest"]
 }

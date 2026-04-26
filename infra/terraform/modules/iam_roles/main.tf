@@ -55,6 +55,7 @@ locals {
     "publish_triage",
     "generate_pdf",
     "adversarial_probe",
+    "reviewer_disagreement_digest",
   ]
 }
 
@@ -355,6 +356,26 @@ resource "aws_iam_role_policy" "adversarial_probe" {
   name   = "adversarial-probe"
   role   = aws_iam_role.lambda["adversarial_probe"].id
   policy = data.aws_iam_policy_document.adversarial_probe.json
+}
+
+# ---------------- reviewer-disagreement-digest ----------------
+data "aws_iam_policy_document" "reviewer_disagreement_digest" {
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:Scan"]
+    resources = ["arn:aws:dynamodb:*:*:table/${var.name_prefix}-golden-set-candidates"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendEmail"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "reviewer_disagreement_digest" {
+  name   = "reviewer-disagreement-digest"
+  role   = aws_iam_role.lambda["reviewer_disagreement_digest"].id
+  policy = data.aws_iam_policy_document.reviewer_disagreement_digest.json
 }
 
 # ---------------- step-functions ----------------

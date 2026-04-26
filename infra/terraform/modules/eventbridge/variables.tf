@@ -13,3 +13,8 @@ variable "weekly_cron" {
 variable "monthly_cron" {
   type = string
 }
+
+variable "reviewer_disagreement_digest_arn" {
+  type        = string
+  description = "ARN of the reviewer-disagreement-digest Lambda function."
+}
