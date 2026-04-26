@@ -297,6 +297,20 @@
     "MarkQuarantined": {
       "Type": "Pass",
       "Parameters": {
+        "passed": false,
+        "passed_int": 0,
+        "faithfulness": 0,
+        "completeness": 0,
+        "fabrication": 1.0,
+        "reasoning": "Quarantined upstream — Judge not run",
+        "model_id": "n/a"
+      },
+      "ResultPath": "$.judge",
+      "Next": "MarkQuarantineFlag"
+    },
+    "MarkQuarantineFlag": {
+      "Type": "Pass",
+      "Parameters": {
         "all_gates_passed": false
       },
       "ResultPath": "$.quarantine",
