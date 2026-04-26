@@ -145,3 +145,17 @@ class AdversarialCase(BaseModel):
         "agent_quotes_verbatim",
     ]
     expected_assertions: list[str]  # human-readable assertions, checked by adversarial_runner
+
+
+class WeakClaim(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    claim: str
+    confidence: float  # 0..1, higher = more suspect
+    reasoning: str
+
+
+class WeakClaimsReport(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    weak_claims: list[WeakClaim]
+    overall_assessment: str
+    model_id: str
