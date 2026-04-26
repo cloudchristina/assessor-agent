@@ -40,3 +40,6 @@ packages = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers --cov=src --cov-report=term-missing --cov-report=xml"
+markers = [
+    "slow: marks tests as slow (10k Hypothesis examples); deselect with '--run-slow' absent",
+]
