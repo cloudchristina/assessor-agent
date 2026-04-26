@@ -109,6 +109,71 @@
   #help dt{color:var(--accent-coral);font-family:"SF Mono","Menlo",monospace}
   #help dd{color:var(--ink-muted)}
   .slide.bignum-slide{justify-content:center;align-items:flex-start}
+  /* ================ MANTEL TEMPLATE — content (light) + section (dark) ================ */
+  /* Content slides: light bg, navy title, coral subtitle, dark cards inside */
+  .slide.content{
+    background:linear-gradient(180deg,#ffffff 0%,#f4f7fa 100%);
+    color:#1a2a3a;
+  }
+  .slide.content h1{color:#062338}
+  .slide.content h2{color:#E5777E;font-weight:600}
+  .slide.content h3{color:#062338}
+  .slide.content p{color:#2a3a4a}
+  .slide.content strong{color:#062338}
+  .slide.content em{color:#062338;font-style:italic;font-weight:500}
+  .slide.content code{color:#9C2B33;background:rgba(6,35,56,.06)}
+  .slide.content blockquote{color:#2a3a4a;border-left-color:#E5777E}
+  .slide.content ul{color:#2a3a4a}
+  .slide.content table th{color:#062338;border-bottom-color:rgba(6,35,56,.2)}
+  .slide.content table td{color:#2a3a4a;border-bottom-color:rgba(6,35,56,.08)}
+  .slide.content .pageno{color:rgba(6,35,56,.4)}
+  .slide.content .label{color:#E5777E}
+  .slide.content .tag{color:#1F4F73}
+  /* Cards on light slides invert to dark navy with white text */
+  .slide.content .card{
+    background:#062338;color:#ffffff;border:none;
+    box-shadow:0 6px 20px rgba(6,35,56,.08);
+  }
+  .slide.content .card *{color:#ffffff}
+  .slide.content .card p,.slide.content .card .what{color:#D9E5EC}
+  .slide.content .card .num,.slide.content .card .tag{color:#E5777E}
+  .slide.content .card h3,.slide.content .card strong{color:#ffffff}
+  .slide.content .card code{color:#FFB347;background:rgba(255,255,255,.08)}
+  /* Stack rows on light slides */
+  .slide.content .layer{background:#062338;color:#ffffff;border-left-color:#7BB7E0}
+  .slide.content .layer.deployed{border-left-color:#E5777E}
+  .slide.content .layer .name{color:#ffffff}
+  .slide.content .layer .what{color:#D9E5EC}
+  .slide.content .layer .n{color:#E5777E}
+  .slide.content .layer code{color:#FFB347;background:rgba(255,255,255,.08)}
+  .slide.content .layer strong{color:#ffffff}
+  /* Wrap SVG diagrams in a dark canvas so existing colours still work */
+  .svg-canvas{
+    background:radial-gradient(ellipse 90% 70% at 22% 50%,#14516E 0%,#0B3551 36%,#062338 100%);
+    border-radius:14px;padding:20px 22px;margin-top:14px;
+    box-shadow:0 8px 24px rgba(6,35,56,.12);
+  }
+  /* "Make things better." footer for content slides */
+  .tagline{
+    position:absolute;bottom:32px;right:60px;
+    font-size:16px;color:#062338;font-weight:600;
+  }
+  .tagline em{color:#E5777E;font-style:italic;font-weight:700}
+  /* Top-right Mantel logo for content slides — needs the dark-text version (image8) on light bg */
+  .mark.tr{position:absolute;top:36px;right:60px}
+  .mark.tr img{height:30px;width:auto}
+  /* Override inline-styled colours that came from the dark-theme version */
+  .slide.content h3[style*="#7BB7E0"]{color:#1F4F73 !important}
+  .slide.content .card h3[style*="#7BB7E0"],
+  .slide.content .card [style*="color:#7BB7E0"]{color:#7BB7E0 !important}
+  .slide.content [style*="color:#fff"]:not(.card *){color:#062338 !important}
+  .slide.content [style*="#FFB347"]:not(.card *){color:#C26900 !important}
+  /* Section divider slides — dark navy, big centered title, logo bottom-right */
+  .slide.section{justify-content:center;align-items:flex-start}
+  .slide.section h1{font-size:80px;color:#ffffff;line-height:1.05}
+  .slide.section h2{font-size:30px;color:var(--accent-blue);font-weight:400;margin-top:14px}
+  .slide.section .mark.br{bottom:32px;right:60px;position:absolute}
+  .slide.section .mark.br img{height:34px}
 </style>
 </head>
 <body>
@@ -131,7 +196,7 @@
 </section>
 
 <!-- ============ SLIDE 2 — IRAP / ISM / Cost ============ -->
-<section class="slide" data-slide="2">
+<section class="slide content" data-slide="2">
   <h1>IRAP &amp; ISM — and the bill</h1>
   <h2>Australia's framework for systems handling regulated data</h2>
 
@@ -163,7 +228,7 @@
 </section>
 
 <!-- ============ SLIDE 3 — Why agentic ============ -->
-<section class="slide" data-slide="3">
+<section class="slide content" data-slide="3">
   <h1>Why agentic — and where the speed-up actually comes from</h1>
   <h2>Turn weeks of reviewer effort into minutes of attestation, without losing audit trail</h2>
 
@@ -196,11 +261,12 @@
 </section>
 
 <!-- ============ SLIDE 4 — Entire architecture ============ -->
-<section class="slide" data-slide="4">
+<section class="slide content" data-slide="4">
   <h1>Architecture — agent isn't at the centre</h1>
   <h2>EventBridge schedule → 10 Lambdas in Step Functions → DDB + S3 (Object Lock 7y)</h2>
 
-  <svg viewBox="0 0 1400 460" style="width:100%;height:auto;margin-top:18px" xmlns="http://www.w3.org/2000/svg">
+  <div class="svg-canvas">
+  <svg viewBox="0 0 1400 460" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7BB7E0"/></marker>
       <marker id="arr-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(229,119,126,.7)"/></marker>
@@ -300,14 +366,15 @@
     </g>
     <text x="1075" y="320" fill="#E5777E" font-size="11" font-weight="700">monthly only</text>
   </svg>
+  </div>
 
-  <p style="margin-top:8px"><em>Notice the agent is on the right of the chain — not at the centre.</em> The rules engine does the maths; the agent only writes the story.</p>
+  <p style="margin-top:14px"><em>Notice the agent is on the right of the chain — not at the centre.</em> The rules engine does the maths; the agent only writes the story.</p>
   <div class="pageno">04 / 12</div>
   <aside class="notes" hidden>Walk LEFT-to-RIGHT. Pause at rules-engine ("deterministic, pure Python, no LLM"). Pause at agent-narrator ("Strands, Bedrock Sonnet, 4 read-only tools"). Pause at the 3 gates ("any failure → quarantine"). Land: "agent isn't at the centre — that's the choice that makes this auditable."</aside>
 </section>
 
 <!-- ============ SLIDE 5 — Stage I ============ -->
-<section class="slide" data-slide="5">
+<section class="slide content" data-slide="5">
   <div class="label">Stage I</div>
   <h1>Deterministic foundation — six rules, six Lambdas</h1>
 
@@ -344,7 +411,7 @@
 </section>
 
 <!-- ============ SLIDE 6 — Stage II why ============ -->
-<section class="slide" data-slide="6">
+<section class="slide content" data-slide="6">
   <div class="label">Stage II</div>
   <h1>The agent layer — and its scope</h1>
 
@@ -381,11 +448,12 @@
 </section>
 
 <!-- ============ SLIDE 7 — Stage II flow ============ -->
-<section class="slide" data-slide="7">
+<section class="slide content" data-slide="7">
   <h1>Stage II flow — agent + 4 tools + 3 gates + judge</h1>
   <h2>Findings in · NarrativeReport out · every step traceable, every failure quarantines</h2>
 
-  <svg viewBox="0 0 1400 460" style="width:100%;height:auto;margin-top:18px" xmlns="http://www.w3.org/2000/svg">
+  <div class="svg-canvas">
+  <svg viewBox="0 0 1400 460" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7BB7E0"/></marker>
       <marker id="arr2r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#E5777E"/></marker>
@@ -477,13 +545,14 @@
     <line x1="1290" y1="260" x2="1290" y2="340" stroke="#E5777E" stroke-width="2" marker-end="url(#arr2r)"/>
     <text x="1330" y="310" fill="#E5777E" font-size="12" font-weight="700">no · QUARANTINE</text>
   </svg>
+  </div>
 
   <div class="pageno">07 / 12</div>
   <aside class="notes" hidden>Walk: input (only IDs + summary, never raw rows) → agent + 4 tools (every tool call = one signed span) → NarrativeReport (Pydantic forced via tool-use) → 3 gates run in parallel → judge → Choice. Land: "any single failure quarantines the whole run."</aside>
 </section>
 
 <!-- ============ SLIDE 8 — Guardrails + evals + hallucinations ============ -->
-<section class="slide" data-slide="8">
+<section class="slide content" data-slide="8">
   <h1>Guardrails, evals, and managing hallucinations</h1>
   <h2>Multi-layered defence — the consensus pattern from Anthropic, AWS, and the agent-safety literature</h2>
 
@@ -516,11 +585,12 @@
 </section>
 
 <!-- ============ SLIDE 9 — Tracing ============ -->
-<section class="slide" data-slide="9">
+<section class="slide content" data-slide="9">
   <h1>Tracing — every tool call is a signed span</h1>
   <h2>One env var unlocks all of this. <code>STRANDS_TELEMETRY_ENABLED=true</code> → ADOT layer → X-Ray.</h2>
 
   <div class="grid-2" style="margin-top:18px;align-items:stretch">
+    <div class="svg-canvas" style="margin-top:0">
     <svg viewBox="0 0 600 420" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="trc-sfn" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#B66DFF"/><stop offset="100%" stop-color="#7E3FB8"/></linearGradient>
@@ -568,6 +638,7 @@
 
       <text x="20" y="395" fill="rgba(255,255,255,.6)" font-size="11" font-style="italic">X-Ray timeline · one trace = one Step Functions execution</text>
     </svg>
+    </div>
 
     <div>
       <h3 style="color:#7BB7E0;font-weight:600;margin-bottom:12px">Why this matters for compliance</h3>
@@ -594,7 +665,7 @@
 </section>
 
 <!-- ============ SLIDE 10 — Summary ============ -->
-<section class="slide" data-slide="10">
+<section class="slide content" data-slide="10">
   <div class="label">Recap</div>
   <h1>Posture, not a demo</h1>
 
@@ -632,30 +703,16 @@
   <aside class="notes" hidden>Slow down. Three numbers ($5 / 75s / 7y) land hardest. Then the prosecutor / barrister / judge line — pause after, then "Questions?"</aside>
 </section>
 
-<!-- ============ SLIDE 11 — Thanks ============ -->
-<section class="slide" data-slide="11">
-  <h1>Thanks</h1>
-  <h2>Christina Chen — Senior Consultant · Banking &amp; Finance</h2>
-
-  <div style="margin-top:30px;font-size:24px;line-height:1.8">
-    <p><span class="tag">email</span> &nbsp; <code>connie0972001@gmail.com</code></p>
-    <p><span class="tag">linkedin</span> &nbsp; <code>/in/christina-chen-au</code></p>
-    <p><span class="tag">repo</span> &nbsp; <code>github.com/cloudchristina/assessor-agent</code> · source on request</p>
-  </div>
-
-  <h3 style="margin-top:40px;color:#7BB7E0;font-weight:600">Ask me about</h3>
-  <div class="grid-3" style="margin-top:16px">
-    <div class="card"><p>Strands native OTel + X-Ray tool spans</p></div>
-    <div class="card"><p>The four read-only tools and how we picked them</p></div>
-    <div class="card"><p>The Plan 2 eval suite (50-case golden, in flight)</p></div>
-  </div>
-
+<!-- ============ SLIDE 11 — Thanks (section-divider style) ============ -->
+<section class="slide section" data-slide="11">
+  <h1>Thanks · Q&amp;A</h1>
+  <h2>Christina Chen · connie0972001@gmail.com · github.com/cloudchristina/assessor-agent</h2>
   <div class="pageno">11 / 12</div>
-  <aside class="notes" hidden>Q&A slide stays up ~3-4 min. If asked anything you can't answer: "Great question — I'll follow up by email." Hand out card. Never bluff in front of regulators-in-the-audience.</aside>
+  <aside class="notes" hidden>Q&A stays up ~3-4 min. If asked anything you can't answer: "Great question — I'll follow up by email." Hand out card. Ask me about: Strands native OTel + X-Ray tool spans · the four read-only tools · the Plan 2 eval suite (50-case golden, in flight).</aside>
 </section>
 
 <!-- ============ SLIDE 12 — Backup ============ -->
-<section class="slide" data-slide="12">
+<section class="slide content" data-slide="12">
   <div class="label">Backup · for Q&amp;A only</div>
   <h1>The six rules in one frame</h1>
 
@@ -818,6 +875,15 @@
     }
   };
   window._timer.render(); updatePresenter();
+
+  // Mantel template chrome — inject logo + tagline per slide-class
+  document.querySelectorAll('.slide.content').forEach(s=>{
+    s.insertAdjacentHTML('afterbegin','<div class="mark tr"><img src="./assets/mantel/image8.png" alt="Mantel"></div>');
+    s.insertAdjacentHTML('beforeend','<div class="tagline">Make things <em>better</em>.</div>');
+  });
+  document.querySelectorAll('.slide.section').forEach(s=>{
+    s.insertAdjacentHTML('beforeend','<div class="mark br"><img src="./assets/mantel/image1.png" alt="Mantel"></div>');
+  });
 
   const help=document.getElementById('help');
   let ct; document.addEventListener('mousemove',()=>{
