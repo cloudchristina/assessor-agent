@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280, initial-scale=1">
+<title>IRAP UAR Agent · Christina Chen · Mantel</title>
+<style>
+  /* ---------- Mantel theme ---------- */
+  :root{
+    --bg-deep:#062338;
+    --bg-mid:#0B3551;
+    --bg-light:#14516E;
+    --ink:#ffffff;
+    --ink-muted:#D9E5EC;
+    --accent-blue:#7BB7E0;
+    --accent-coral:#E5777E;
+    --line:rgba(123,183,224,.25);
+    --card:rgba(255,255,255,.04);
+    --code:rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:var(--bg-deep);overflow:hidden;
+    font-family:-apple-system,"Inter","Helvetica Neue",Helvetica,Arial,sans-serif;
+    color:var(--ink);font-weight:400;-webkit-font-smoothing:antialiased}
+  /* Deck container = a fixed 1600x900 stage scaled to viewport */
+  #deck{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #stage{
+    width:1600px;height:900px;position:relative;
+    transform-origin:center center;
+    background:radial-gradient(ellipse 90% 70% at 22% 50%, var(--bg-light) 0%, var(--bg-mid) 36%, var(--bg-deep) 100%);
+    overflow:hidden;
+  }
+  .slide{
+    position:absolute;inset:0;padding:80px 100px;
+    opacity:0;pointer-events:none;transition:opacity .25s ease;
+    display:flex;flex-direction:column;
+  }
+  .slide.active{opacity:1;pointer-events:auto}
+  /* ---------- Mantel logo (top-left on title, bottom-right elsewhere) ---------- */
+  .mark{position:absolute;display:flex;align-items:center;gap:12px}
+  .mark img{height:30px;width:auto}
+  .mark span{color:#fff;font-weight:700;font-size:22px;letter-spacing:-.01em}
+  .mark.tl{top:46px;left:80px}
+  .mark.tl img{height:44px}
+  .mark.tl span{font-size:30px}
+  .mark.br{bottom:32px;right:80px}
+  .pageno{position:absolute;bottom:36px;left:80px;color:rgba(255,255,255,.4);font-size:14px;letter-spacing:.1em}
+  /* ---------- typography ---------- */
+  h1{font-weight:700;font-size:64px;line-height:1.05;letter-spacing:-.02em;margin-bottom:18px}
+  h2{font-weight:500;font-size:30px;color:var(--accent-blue);margin-bottom:24px}
+  h3{font-weight:600;font-size:24px;color:#fff}
+  p{font-size:24px;line-height:1.45;color:var(--ink-muted);max-width:1200px}
+  strong{color:#fff;font-weight:700}
+  em{color:var(--accent-blue);font-style:normal;font-weight:500}
+  code{background:rgba(255,255,255,.06);color:var(--accent-coral);padding:2px 8px;border-radius:4px;font-size:.92em;font-family:"SF Mono","Menlo",monospace}
+  blockquote{border-left:4px solid var(--accent-coral);color:var(--ink-muted);font-style:italic;padding-left:18px;font-size:24px;margin-top:18px;max-width:1100px}
+  ul{padding-left:28px;color:var(--ink-muted);font-size:22px}
+  ul li{margin:8px 0}
+  .tag{color:var(--accent-blue);font-size:20px;letter-spacing:.04em}
+  .label{color:var(--accent-coral);font-size:18px;text-transform:uppercase;letter-spacing:.18em;font-weight:600;margin-bottom:18px}
+  .slide.title h1{font-size:96px;margin-top:60px}
+  .slide.title h2{font-size:36px;font-weight:400;margin-top:20px}
+  .slide.title .role{margin-top:auto;color:var(--accent-blue);font-size:22px}
+  .bignum{font-size:240px;font-weight:800;line-height:1;color:#fff;letter-spacing:-.04em}
+  .bignum-sub{font-size:34px;color:var(--accent-blue);max-width:1100px;margin-top:24px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:24px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:24px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px}
+  .card .num{color:var(--accent-coral);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.16em}
+  .card h3{margin:10px 0 12px}
+  .card p{font-size:20px}
+  .stack{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+  .layer{display:grid;grid-template-columns:60px 220px 1fr;gap:18px;align-items:center;
+    padding:16px 22px;background:var(--card);border-left:4px solid var(--accent-blue);border-radius:8px}
+  .layer .n{color:var(--accent-coral);font-weight:700;font-size:24px}
+  .layer .name{color:#fff;font-weight:600;font-size:22px}
+  .layer .what{color:var(--ink-muted);font-size:20px}
+  .layer.deployed{border-left-color:var(--accent-coral)}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:20px 24px;
+    color:var(--ink-muted);font:20px/1.55 "SF Mono","Menlo",monospace;overflow:hidden}
+  pre .k{color:var(--accent-coral)}
+  pre .v{color:var(--accent-blue)}
+  /* ---------- presenter overlay ---------- */
+  #presenter{position:fixed;inset:0;background:rgba(6,35,56,.97);color:#fff;display:none;
+    grid-template-columns:1.3fr 1fr;gap:32px;padding:32px;z-index:100;font-size:18px}
+  #presenter.on{display:grid}
+  #presenter .now,#presenter .next{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:24px;display:flex;flex-direction:column}
+  #presenter .label-sm{color:var(--accent-coral);text-transform:uppercase;letter-spacing:.16em;font-size:13px;margin-bottom:8px}
+  #presenter .now h3, #presenter .next h3{font-size:22px;margin-bottom:8px}
+  #presenter .notes{flex:1;background:var(--code);border-radius:10px;padding:18px;font-size:18px;line-height:1.5;color:var(--ink-muted);white-space:pre-wrap;overflow:auto}
+  #presenter .right{display:grid;grid-template-rows:auto 1fr;gap:18px}
+  #presenter .timer{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;text-align:center}
+  #presenter .timer .clock{font-size:64px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+  #presenter .timer .target{color:var(--accent-blue);font-size:18px;margin-top:6px}
+  #presenter .timer .controls{margin-top:14px;display:flex;gap:10px;justify-content:center}
+  #presenter button{background:transparent;border:1px solid var(--line);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:14px}
+  #presenter button:hover{border-color:var(--accent-blue)}
+  #help{position:fixed;inset:0;background:rgba(6,35,56,.95);color:#fff;display:none;align-items:center;justify-content:center;z-index:200}
+  #help.on{display:flex}
+  #help .box{background:var(--bg-mid);border:1px solid var(--line);border-radius:14px;padding:36px 44px;font-size:18px;max-width:560px}
+  #help h3{font-size:22px;margin-bottom:14px;color:#fff}
+  #help dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px}
+  #help dt{color:var(--accent-coral);font-family:"SF Mono","Menlo",monospace}
+  #help dd{color:var(--ink-muted)}
+  .slide.bignum-slide{justify-content:center;align-items:flex-start}
+</style>
+</head>
+<body>
+
+<div id="deck"><div id="stage">
+
+<!-- ============ SLIDE 1 — Hello ============ -->
+<section class="slide title active" data-slide="1">
+  <div class="mark tl"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <h1>Christina Chen</h1>
+  <h2>Senior Consultant — Banking &amp; Finance · Mantel Group</h2>
+  <div class="role">An auditor-grade compliance agent on serverless<br>Serverless Meetup Sydney · April 2026</div>
+  <div class="pageno">01 / 12</div>
+  <aside class="notes" hidden>Two beats of silence after the title appears. Then: "Twenty-five minutes. Live demo. One attempt to break it on stage. Let's go." Press T to start the timer as you say "now".</aside>
+</section>
+
+<!-- ============ SLIDE 2 — Why I'm doing this ============ -->
+<section class="slide bignum-slide" data-slide="2">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <div class="label">Why I'm doing this</div>
+  <div class="bignum">3,000</div>
+  <div class="bignum-sub">engineer-hours per Australian bank, per year, on <strong>one</strong> access review report.</div>
+  <p style="margin-top:36px;max-width:1100px">APRA CPS 234 §35 — User Access Review. Today: spreadsheets, screenshots, email threads.<br>
+    A bank told me their last cycle ran <strong>47 reviewers · 11 weeks · one finding missed</strong>.</p>
+  <blockquote style="margin-top:28px">Auditors don't forget missed findings. So I built one that doesn't miss them — and that the auditor can replay.</blockquote>
+  <div class="pageno">02 / 12</div>
+  <aside class="notes" hidden>Hold the number 3,000. Beat. The "47 reviewers / 11 weeks / one finding missed" is the emotional anchor — it is anonymised but real. Don't soften it. The closing italics is your "why" — say it slowly.</aside>
+</section>
+
+<!-- ============ SLIDE 3 — Today ============ -->
+<section class="slide" data-slide="3">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <h1>Today — three things</h1>
+  <h2>25 minutes · live demo · one attempt to break it on stage</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="num">01</div>
+      <h3>Build it on serverless</h3>
+      <p>Six rules · ten Lambdas · zero servers. Pure-Python compliance pipeline auditors can replay row-by-row.</p>
+    </div>
+    <div class="card">
+      <div class="num">02</div>
+      <h3>Let an agent narrate</h3>
+      <p>Strands + Bedrock. <strong>Read-only, four tools, no maths.</strong> The agent writes the story; the rules engine does the counting.</p>
+    </div>
+    <div class="card">
+      <div class="num">03</div>
+      <h3>Stop it lying — provably</h3>
+      <p>Five layers of defence. We'll trigger a prompt injection live and watch the citation gate fire.</p>
+    </div>
+  </div>
+  <p style="margin-top:36px"><em>What this talk is not:</em> a tour of every AWS service. It's a worked example of <strong>agent-with-guardrails</strong> as a compliance posture.</p>
+  <div class="pageno">03 / 12</div>
+  <aside class="notes" hidden>Set expectations. Three cards = three checkpoints in the audience's head. Card 3 is the money one — flag it now so they're waiting for the live break attempt.</aside>
+</section>
+
+<!-- ============ SLIDE 4 — Entire architecture ============ -->
+<section class="slide" data-slide="4">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <h1>Architecture — agent isn't at the centre</h1>
+  <h2>EventBridge schedule → 10 Lambdas in Step Functions → DDB + S3 (Object Lock 7y)</h2>
+
+  <svg viewBox="0 0 1400 460" style="width:100%;height:auto;margin-top:18px" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7BB7E0"/></marker>
+      <marker id="arr-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(229,119,126,.7)"/></marker>
+      <linearGradient id="lambda-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFB347"/><stop offset="100%" stop-color="#E78A00"/></linearGradient>
+      <linearGradient id="agent-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#CE93D8"/><stop offset="100%" stop-color="#9C27B0"/></linearGradient>
+    </defs>
+
+    <rect x="160" y="80" width="1080" height="320" rx="18" fill="rgba(182,109,255,.06)" stroke="rgba(182,109,255,.4)" stroke-dasharray="6 6"/>
+    <text x="180" y="108" fill="#B66DFF" font-size="14" font-weight="700" letter-spacing="2">STEP FUNCTIONS — one execution per run</text>
+
+    <g transform="translate(40,180)">
+      <circle cx="40" cy="40" r="36" fill="#F06292" stroke="rgba(255,255,255,.18)"/>
+      <text x="40" y="46" text-anchor="middle" fill="#fff" font-weight="800" font-size="14">EB</text>
+      <text x="40" y="100" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">EventBridge</text>
+      <text x="40" y="118" text-anchor="middle" fill="#D9E5EC" font-size="11">cron · weekly + monthly</text>
+    </g>
+    <line x1="120" y1="220" x2="195" y2="220" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr)"/>
+
+    <g transform="translate(195,180)">
+      <rect width="110" height="80" rx="12" fill="url(#lambda-grad)"/>
+      <text x="55" y="36" text-anchor="middle" fill="#fff" font-weight="800" font-size="18">λ</text>
+      <text x="55" y="58" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">extract-uar</text>
+      <text x="55" y="100" text-anchor="middle" fill="#D9E5EC" font-size="11">SQL Server → CSV</text>
+    </g>
+    <line x1="305" y1="220" x2="345" y2="220" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr)"/>
+
+    <g transform="translate(345,180)">
+      <rect width="80" height="80" rx="12" fill="#7CB342"/>
+      <text x="40" y="38" text-anchor="middle" fill="#fff" font-weight="800" font-size="14">S3</text>
+      <text x="40" y="58" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">raw/</text>
+      <text x="40" y="100" text-anchor="middle" fill="#D9E5EC" font-size="11">CSV + manifest</text>
+      <text x="40" y="116" text-anchor="middle" fill="#FFD54F" font-size="10">SHA-256</text>
+    </g>
+    <line x1="425" y1="220" x2="465" y2="220" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr)"/>
+
+    <g transform="translate(465,180)">
+      <rect width="110" height="80" rx="12" fill="url(#lambda-grad)"/>
+      <text x="55" y="36" text-anchor="middle" fill="#fff" font-weight="800" font-size="18">λ</text>
+      <text x="55" y="58" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">validate+hash</text>
+      <text x="55" y="100" text-anchor="middle" fill="#D9E5EC" font-size="11">Pydantic v2</text>
+    </g>
+    <line x1="575" y1="220" x2="615" y2="220" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr)"/>
+
+    <g transform="translate(615,180)">
+      <rect width="110" height="80" rx="12" fill="url(#lambda-grad)" stroke="#7BB7E0" stroke-width="2"/>
+      <text x="55" y="36" text-anchor="middle" fill="#fff" font-weight="800" font-size="18">λ</text>
+      <text x="55" y="58" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">rules-engine</text>
+      <text x="55" y="100" text-anchor="middle" fill="#7BB7E0" font-size="11" font-weight="600">R1–R6 · pure Python</text>
+    </g>
+    <line x1="725" y1="220" x2="765" y2="220" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr)"/>
+
+    <g transform="translate(765,180)">
+      <rect width="110" height="80" rx="12" fill="url(#agent-grad)" stroke="#CE93D8" stroke-width="2"/>
+      <text x="55" y="36" text-anchor="middle" fill="#fff" font-weight="800" font-size="18">λ</text>
+      <text x="55" y="58" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">agent-narrator</text>
+      <text x="55" y="100" text-anchor="middle" fill="#CE93D8" font-size="11" font-weight="600">Strands · Sonnet 4.6</text>
+    </g>
+    <line x1="875" y1="220" x2="915" y2="220" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr)"/>
+
+    <g transform="translate(915,150)">
+      <rect width="120" height="36" rx="8" fill="url(#lambda-grad)"/>
+      <text x="60" y="23" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">citation-gate</text>
+      <rect y="46" width="120" height="36" rx="8" fill="url(#lambda-grad)"/>
+      <text x="60" y="69" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">reconciliation-gate</text>
+      <rect y="92" width="120" height="36" rx="8" fill="url(#lambda-grad)"/>
+      <text x="60" y="115" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">grounding-gate</text>
+      <text x="60" y="160" text-anchor="middle" fill="#D9E5EC" font-size="11">3 deterministic gates</text>
+    </g>
+    <line x1="1035" y1="220" x2="1075" y2="220" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr)"/>
+
+    <g transform="translate(1075,180)">
+      <rect width="100" height="80" rx="12" fill="url(#agent-grad)"/>
+      <text x="50" y="36" text-anchor="middle" fill="#fff" font-weight="800" font-size="18">λ</text>
+      <text x="50" y="58" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">judge</text>
+      <text x="50" y="100" text-anchor="middle" fill="#CE93D8" font-size="11" font-weight="600">Haiku 4.5</text>
+    </g>
+    <line x1="1175" y1="220" x2="1215" y2="220" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr)"/>
+
+    <g transform="translate(1215,180)">
+      <rect width="80" height="80" rx="12" fill="#4FC3F7"/>
+      <text x="40" y="36" text-anchor="middle" fill="#fff" font-weight="800" font-size="14">DDB</text>
+      <text x="40" y="58" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">findings</text>
+      <text x="40" y="100" text-anchor="middle" fill="#D9E5EC" font-size="11">+ AppSync</text>
+    </g>
+
+    <line x1="1125" y1="260" x2="1125" y2="330" stroke="rgba(229,119,126,.7)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arr-dim)"/>
+    <g transform="translate(1075,330)">
+      <rect width="100" height="60" rx="12" fill="url(#lambda-grad)" opacity=".85"/>
+      <text x="50" y="26" text-anchor="middle" fill="#fff" font-weight="800" font-size="14">λ</text>
+      <text x="50" y="46" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">generate-pdf</text>
+    </g>
+    <line x1="1175" y1="360" x2="1215" y2="360" stroke="rgba(229,119,126,.7)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arr-dim)"/>
+    <g transform="translate(1215,330)">
+      <rect width="100" height="60" rx="12" fill="#7CB342"/>
+      <text x="50" y="26" text-anchor="middle" fill="#fff" font-weight="800" font-size="14">S3</text>
+      <text x="50" y="46" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">reports/ · Lock 7y</text>
+    </g>
+    <text x="1075" y="320" fill="#E5777E" font-size="11" font-weight="700">monthly only</text>
+  </svg>
+
+  <p style="margin-top:8px"><em>Notice the agent is on the right of the chain — not at the centre.</em> The rules engine does the maths; the agent only writes the story.</p>
+  <div class="pageno">04 / 12</div>
+  <aside class="notes" hidden>Walk LEFT-to-RIGHT. Pause at rules-engine ("deterministic, pure Python, no LLM"). Pause at agent-narrator ("Strands, Bedrock Sonnet, 4 read-only tools"). Pause at the 3 gates ("any failure → quarantine"). Land: "agent isn't at the centre — that's the choice that makes this auditable."</aside>
+</section>
+
+<!-- ============ SLIDE 5 — Stage I ============ -->
+<section class="slide" data-slide="5">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <div class="label">Stage I</div>
+  <h1>Deterministic foundation — six rules, six Lambdas</h1>
+
+  <div class="grid-2" style="margin-top:20px">
+    <div>
+      <h3 style="color:#7BB7E0;font-weight:600;margin-bottom:14px">Why Lambda?</h3>
+      <ul>
+        <li><strong>Per-Lambda IAM</strong> · least-privilege is automatic. <code>extract-uar</code> can read SQL Server; <code>rules-engine</code> can't.</li>
+        <li><strong>Per-Lambda OTel span</strong> · every step is one segment in X-Ray. Auditor's trace is free.</li>
+        <li><strong>Cold-start ok</strong> · weekly + monthly cadence; we accept 800ms to save the orchestration overhead.</li>
+        <li><strong>Pay-per-invocation</strong> · ~$0.30 / month for all 10 Lambdas at this volume.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:#7BB7E0;font-weight:600;margin-bottom:14px">Challenges we hit</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="padding:16px 20px">
+          <div class="num">01 · Rules correctness</div>
+          <p style="font-size:18px;margin-top:6px">Six rules → six per-rule golden suites + counterfactual tests. Flipping one input must flip only the expected rule.</p>
+        </div>
+        <div class="card" style="padding:16px 20px">
+          <div class="num">02 · Provable coverage</div>
+          <p style="font-size:18px;margin-top:6px">Manifest <code>SHA-256</code> of sorted row-IDs. Auditor re-derives it. "We didn't miss a row" becomes a hash check, not a promise.</p>
+        </div>
+        <div class="card" style="padding:16px 20px">
+          <div class="num">03 · Speaks auditor</div>
+          <p style="font-size:18px;margin-top:6px">Every finding carries its <strong>ISM control</strong> + structured <strong>evidence dict</strong>. The finding answers "why?" inline.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pageno">05 / 12</div>
+  <aside class="notes" hidden>"The boring half. We do this on purpose. Once it works deterministically, then — and only then — do we let an agent near it." Spend most time on the right column; the left is recap.</aside>
+</section>
+
+<!-- ============ SLIDE 6 — Stage II why ============ -->
+<section class="slide" data-slide="6">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <div class="label">Stage II</div>
+  <h1>The agent layer — and its scope</h1>
+
+  <div class="grid-2" style="margin-top:18px">
+    <div class="card">
+      <h3 style="color:#7BB7E0;margin-bottom:14px">Why an agent at all?</h3>
+      <p style="font-size:20px">200+ findings per cycle. Reviewers don't read evidence dicts — they read <strong>stories</strong>.</p>
+      <ul style="margin-top:10px;font-size:19px">
+        <li>Cluster findings into themes</li>
+        <li>Draft remediation language</li>
+        <li>Answer "why this principal?" in chat</li>
+      </ul>
+      <p style="font-size:18px;color:var(--accent-coral);margin-top:14px"><strong>Without it:</strong> 6-hour reviewer task. <strong>With it:</strong> 30 minutes.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#7BB7E0;margin-bottom:14px">Why Strands?</h3>
+      <table style="width:100%;font-size:18px;border-collapse:collapse">
+        <tr><th style="text-align:left;color:var(--accent-blue);padding:6px 0;border-bottom:1px solid var(--line)"></th>
+            <th style="text-align:left;color:var(--accent-blue);padding:6px 8px;border-bottom:1px solid var(--line)">Bedrock SDK</th>
+            <th style="text-align:left;color:var(--accent-blue);padding:6px 8px;border-bottom:1px solid var(--line)">LangChain</th>
+            <th style="text-align:left;color:#fff;padding:6px 8px;border-bottom:1px solid var(--line)"><strong>Strands</strong> ✓</th></tr>
+        <tr><td style="padding:8px 0;color:var(--ink-muted)">Tools</td><td style="padding:8px">DIY</td><td style="padding:8px">heavy</td><td style="padding:8px;color:#fff"><code>@tool</code></td></tr>
+        <tr><td style="padding:8px 0;color:var(--ink-muted)">Structured out</td><td style="padding:8px">manual</td><td style="padding:8px">manual</td><td style="padding:8px;color:#fff">Pydantic via tool-use</td></tr>
+        <tr><td style="padding:8px 0;color:var(--ink-muted)">OTel spans</td><td style="padding:8px">manual</td><td style="padding:8px">plugins</td><td style="padding:8px;color:var(--accent-coral)"><strong>native, every call</strong></td></tr>
+        <tr><td style="padding:8px 0;color:var(--ink-muted)">Guardrails</td><td style="padding:8px">manual</td><td style="padding:8px">manual</td><td style="padding:8px;color:#fff">first-class</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <p style="margin-top:24px;font-size:22px"><strong>Scope:</strong> the agent is a <em>read-only narrator over deterministic findings</em>. It cannot count, vote, assign severity, or mutate state. Adding a tool is an architecture decision, not a commit.</p>
+
+  <div class="pageno">06 / 12</div>
+  <aside class="notes" hidden>Don't bash LangChain — "great framework, just heavier than we need". Land the OTel-native row hard. The bottom paragraph is THE constraint statement; deliver it cleanly.</aside>
+</section>
+
+<!-- ============ SLIDE 7 — Stage II flow ============ -->
+<section class="slide" data-slide="7">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <h1>Stage II flow — agent + 4 tools + 3 gates + judge</h1>
+  <h2>Findings in · NarrativeReport out · every step traceable, every failure quarantines</h2>
+
+  <svg viewBox="0 0 1400 460" style="width:100%;height:auto;margin-top:18px" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7BB7E0"/></marker>
+      <marker id="arr2r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#E5777E"/></marker>
+      <linearGradient id="agent2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#CE93D8"/><stop offset="100%" stop-color="#9C27B0"/></linearGradient>
+      <linearGradient id="lambda2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFB347"/><stop offset="100%" stop-color="#E78A00"/></linearGradient>
+    </defs>
+
+    <g transform="translate(20,200)">
+      <rect width="120" height="60" rx="10" fill="rgba(123,183,224,.15)" stroke="#7BB7E0"/>
+      <text x="60" y="28" text-anchor="middle" fill="#7BB7E0" font-size="12" font-weight="700">findings.json</text>
+      <text x="60" y="44" text-anchor="middle" fill="#D9E5EC" font-size="11">summary + IDs only</text>
+    </g>
+    <line x1="140" y1="230" x2="220" y2="230" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr2)"/>
+
+    <g transform="translate(220,170)">
+      <rect width="200" height="120" rx="14" fill="url(#agent2)" stroke="#CE93D8" stroke-width="2"/>
+      <text x="100" y="32" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">agent-narrator (Strands)</text>
+      <text x="100" y="52" text-anchor="middle" fill="#fff" font-size="11">Bedrock Sonnet 4.6 · temp=0</text>
+      <text x="100" y="100" text-anchor="middle" fill="#fff" font-size="36" font-weight="800">λ</text>
+    </g>
+
+    <g>
+      <g transform="translate(225,80)">
+        <rect width="190" height="44" rx="8" fill="rgba(255,255,255,.08)" stroke="rgba(206,147,216,.5)"/>
+        <text x="12" y="20" fill="#CE93D8" font-size="12" font-weight="700">@tool</text>
+        <text x="12" y="36" fill="#fff" font-size="13" font-weight="600">get_finding(id)</text>
+      </g>
+      <g transform="translate(440,140)">
+        <rect width="220" height="44" rx="8" fill="rgba(255,255,255,.08)" stroke="rgba(206,147,216,.5)"/>
+        <text x="12" y="20" fill="#CE93D8" font-size="12" font-weight="700">@tool</text>
+        <text x="12" y="36" fill="#fff" font-size="13" font-weight="600">get_ism_control(id)</text>
+      </g>
+      <g transform="translate(440,210)">
+        <rect width="220" height="44" rx="8" fill="rgba(255,255,255,.08)" stroke="rgba(206,147,216,.5)"/>
+        <text x="12" y="20" fill="#CE93D8" font-size="12" font-weight="700">@tool</text>
+        <text x="12" y="36" fill="#fff" font-size="13" font-weight="600">get_prior_cycle_summary()</text>
+      </g>
+      <g transform="translate(440,280)">
+        <rect width="220" height="44" rx="8" fill="rgba(255,255,255,.08)" stroke="rgba(206,147,216,.5)"/>
+        <text x="12" y="20" fill="#CE93D8" font-size="12" font-weight="700">@tool</text>
+        <text x="12" y="36" fill="#fff" font-size="13" font-weight="600">get_rule_spec(rule_id)</text>
+      </g>
+      <text x="320" y="345" text-anchor="middle" fill="#E5777E" font-size="13" font-weight="700">4 tools · read-only · every call = one OTel span</text>
+    </g>
+    <line x1="320" y1="170" x2="320" y2="125" stroke="rgba(206,147,216,.5)" stroke-width="1.5"/>
+    <line x1="420" y1="200" x2="440" y2="162" stroke="rgba(206,147,216,.5)" stroke-width="1.5"/>
+    <line x1="420" y1="230" x2="440" y2="232" stroke="rgba(206,147,216,.5)" stroke-width="1.5"/>
+    <line x1="420" y1="260" x2="440" y2="302" stroke="rgba(206,147,216,.5)" stroke-width="1.5"/>
+
+    <g transform="translate(700,200)">
+      <rect width="140" height="60" rx="10" fill="rgba(123,183,224,.15)" stroke="#7BB7E0"/>
+      <text x="70" y="28" text-anchor="middle" fill="#7BB7E0" font-size="12" font-weight="700">NarrativeReport</text>
+      <text x="70" y="44" text-anchor="middle" fill="#D9E5EC" font-size="11">Pydantic · tool-use forced</text>
+    </g>
+    <line x1="420" y1="230" x2="700" y2="230" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr2)"/>
+
+    <line x1="840" y1="230" x2="900" y2="230" stroke="#7BB7E0" stroke-width="2"/>
+    <g transform="translate(900,150)">
+      <rect width="160" height="44" rx="8" fill="url(#lambda2)"/>
+      <text x="80" y="28" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">citation-gate</text>
+    </g>
+    <g transform="translate(900,210)">
+      <rect width="160" height="44" rx="8" fill="url(#lambda2)"/>
+      <text x="80" y="28" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">reconciliation-gate</text>
+    </g>
+    <g transform="translate(900,270)">
+      <rect width="160" height="44" rx="8" fill="url(#lambda2)"/>
+      <text x="80" y="28" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">grounding-gate</text>
+    </g>
+    <line x1="900" y1="172" x2="900" y2="230" stroke="rgba(123,183,224,.4)" stroke-width="1"/>
+    <line x1="900" y1="232" x2="900" y2="292" stroke="rgba(123,183,224,.4)" stroke-width="1"/>
+    <line x1="1060" y1="172" x2="1100" y2="225" stroke="#7BB7E0" stroke-width="2"/>
+    <line x1="1060" y1="232" x2="1100" y2="232" stroke="#7BB7E0" stroke-width="2"/>
+    <line x1="1060" y1="292" x2="1100" y2="240" stroke="#7BB7E0" stroke-width="2"/>
+
+    <g transform="translate(1100,200)">
+      <rect width="120" height="60" rx="10" fill="url(#agent2)" stroke="#CE93D8"/>
+      <text x="60" y="28" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">judge</text>
+      <text x="60" y="46" text-anchor="middle" fill="#CE93D8" font-size="11">Haiku 4.5</text>
+    </g>
+    <line x1="1220" y1="230" x2="1260" y2="230" stroke="#7BB7E0" stroke-width="2" marker-end="url(#arr2)"/>
+
+    <g transform="translate(1260,200)">
+      <polygon points="0,30 30,0 60,30 30,60" fill="rgba(255,255,255,.06)" stroke="#7BB7E0"/>
+      <text x="30" y="35" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">all pass?</text>
+    </g>
+    <line x1="1290" y1="200" x2="1290" y2="120" stroke="#7CB342" stroke-width="2" marker-end="url(#arr2)"/>
+    <text x="1330" y="160" fill="#7CB342" font-size="12" font-weight="700">yes · publish</text>
+    <line x1="1290" y1="260" x2="1290" y2="340" stroke="#E5777E" stroke-width="2" marker-end="url(#arr2r)"/>
+    <text x="1330" y="310" fill="#E5777E" font-size="12" font-weight="700">no · QUARANTINE</text>
+  </svg>
+
+  <div class="pageno">07 / 12</div>
+  <aside class="notes" hidden>Walk: input (only IDs + summary, never raw rows) → agent + 4 tools (every tool call = one signed span) → NarrativeReport (Pydantic forced via tool-use) → 3 gates run in parallel → judge → Choice. Land: "any single failure quarantines the whole run."</aside>
+</section>
+
+<!-- ============ SLIDE 8 — Prompts & evals ============ -->
+<section class="slide" data-slide="8">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <h1>How we stop the agent lying — five layers</h1>
+  <h2>Prompts get you so far. Evals get you the rest.</h2>
+
+  <div class="stack">
+    <div class="layer deployed">
+      <div class="n">L1</div><div class="name">Input constraint</div>
+      <div class="what">Raw rows never reach the model · temp=0 · structured output forced via Bedrock tool-use · no user-controlled strings interpolated</div>
+    </div>
+    <div class="layer deployed">
+      <div class="n">L2</div><div class="name">Hard runtime gates</div>
+      <div class="what">4 Lambdas: <strong>schema · citation · reconciliation · entity-grounding</strong> · pure Python · 100ms total · $0/run</div>
+    </div>
+    <div class="layer deployed">
+      <div class="n">L3</div><div class="name">Cross-model validation</div>
+      <div class="what">Haiku 4.5 LLM-as-judge · adversarial probe · self-consistency on CRITICAL findings — different model family from the generator</div>
+    </div>
+    <div class="layer">
+      <div class="n">L4</div><div class="name">Offline evals (CI gate)</div>
+      <div class="what">Golden + adversarial + counterfactual + Hypothesis property tests — block merge on regression — <em>in flight (Plan 2)</em></div>
+    </div>
+    <div class="layer">
+      <div class="n">L5</div><div class="name">Production drift</div>
+      <div class="what">Shadow evals · reviewer-disagreement loop · weekly KS test · circuit breaker — <em>post-MVP</em></div>
+    </div>
+  </div>
+
+  <p style="margin-top:18px">Coral border = <strong>deployed today</strong>. Blue border = <em>roadmap</em>. The prompt-injection demo will hit <strong>L2 citation-gate</strong> live.</p>
+  <div class="pageno">08 / 12</div>
+  <aside class="notes" hidden>"We can't make the agent never wrong. We can make it provably bounded." After demo 2 (prompt injection), point at L2 specifically — "that's what fired". L4 is what ships next. L5 is what you build after a year of production data.</aside>
+</section>
+
+<!-- ============ SLIDE 9 — Tracing ============ -->
+<section class="slide" data-slide="9">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <h1>Tracing — every tool call is a signed span</h1>
+  <h2>One env var unlocks all of this. <code>STRANDS_TELEMETRY_ENABLED=true</code> → ADOT layer → X-Ray.</h2>
+
+  <div class="grid-2" style="margin-top:18px;align-items:stretch">
+    <svg viewBox="0 0 600 420" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="trc-sfn" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#B66DFF"/><stop offset="100%" stop-color="#7E3FB8"/></linearGradient>
+        <linearGradient id="trc-l" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFB347"/><stop offset="100%" stop-color="#E78A00"/></linearGradient>
+      </defs>
+      <rect x="20" y="20" width="540" height="40" rx="8" fill="url(#trc-sfn)"/>
+      <text x="36" y="46" fill="#fff" font-size="14" font-weight="700">▾ sfn.execution</text>
+      <text x="500" y="46" fill="rgba(255,255,255,.85)" font-size="12">75s</text>
+
+      <rect x="80" y="80" width="480" height="32" rx="6" fill="url(#trc-l)" opacity=".7"/>
+      <text x="96" y="100" fill="#fff" font-size="13" font-weight="600">▸ lambda.extract-uar</text>
+      <text x="500" y="100" fill="#fff" font-size="11">8.2s</text>
+
+      <rect x="80" y="118" width="480" height="32" rx="6" fill="url(#trc-l)" opacity=".7"/>
+      <text x="96" y="138" fill="#fff" font-size="13" font-weight="600">▸ lambda.rules-engine</text>
+      <text x="500" y="138" fill="#fff" font-size="11">1.3s</text>
+
+      <rect x="80" y="156" width="480" height="32" rx="6" fill="url(#trc-l)"/>
+      <text x="96" y="176" fill="#fff" font-size="13" font-weight="700">▾ lambda.agent-narrator</text>
+      <text x="500" y="176" fill="#fff" font-size="11">42.1s</text>
+
+      <rect x="140" y="196" width="420" height="28" rx="6" fill="rgba(206,147,216,.7)"/>
+      <text x="156" y="214" fill="#fff" font-size="12" font-weight="700">▾ strands.agent.loop</text>
+      <text x="500" y="214" fill="#fff" font-size="11">41.6s</text>
+
+      <rect x="200" y="232" width="360" height="24" rx="5" fill="rgba(123,183,224,.45)"/>
+      <text x="216" y="248" fill="#fff" font-size="11" font-weight="700">tool.get_finding</text>
+      <text x="430" y="248" fill="#E5777E" font-size="10">[F-…0001]</text>
+      <text x="525" y="248" fill="#fff" font-size="10">82ms</text>
+
+      <rect x="200" y="262" width="360" height="24" rx="5" fill="rgba(123,183,224,.45)"/>
+      <text x="216" y="278" fill="#fff" font-size="11" font-weight="700">tool.get_ism_control</text>
+      <text x="430" y="278" fill="#E5777E" font-size="10">[ISM-1546]</text>
+      <text x="525" y="278" fill="#fff" font-size="10">61ms</text>
+
+      <rect x="200" y="292" width="360" height="24" rx="5" fill="rgba(206,147,216,.55)"/>
+      <text x="216" y="308" fill="#fff" font-size="11" font-weight="700">bedrock.invoke</text>
+      <text x="380" y="308" fill="#E5777E" font-size="10">[in=4.2k · out=1.1k tok]</text>
+      <text x="525" y="308" fill="#fff" font-size="10">39.8s</text>
+
+      <rect x="200" y="322" width="360" height="24" rx="5" fill="rgba(123,183,224,.45)"/>
+      <text x="216" y="338" fill="#fff" font-size="11" font-weight="700">tool.get_rule_spec</text>
+      <text x="430" y="338" fill="#E5777E" font-size="10">[R3]</text>
+      <text x="525" y="338" fill="#fff" font-size="10">94ms</text>
+
+      <text x="20" y="395" fill="rgba(255,255,255,.6)" font-size="11" font-style="italic">X-Ray timeline · one trace = one Step Functions execution</text>
+    </svg>
+
+    <div>
+      <h3 style="color:#7BB7E0;font-weight:600;margin-bottom:12px">Why this matters for compliance</h3>
+      <ul>
+        <li><strong>Every tool call</strong> is a span — what was asked, what was returned, how long it took.</li>
+        <li><strong>Every Bedrock invoke</strong> is a subsegment with input + output token counts.</li>
+        <li><strong>Every gate</strong> has a <code>passed=true|false</code> attribute. Quarantined runs are obvious.</li>
+        <li><strong>Every span</strong> carries the <code>run_id</code>. One trace ID, full forensic replay.</li>
+      </ul>
+
+      <h3 style="color:#7BB7E0;font-weight:600;margin:20px 0 10px">The wiring</h3>
+<pre><span class="k">env</span>:
+  <span class="v">STRANDS_TELEMETRY_ENABLED</span>: true
+  <span class="v">OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</span>: …
+<span class="k">layers</span>:
+  - arn:…:layer:adot-python:1</pre>
+
+      <p style="font-size:18px;margin-top:14px"><em>Adding a tool = adding a span = adding a slice of audit trail. There is no manual instrumentation.</em></p>
+    </div>
+  </div>
+
+  <div class="pageno">09 / 12</div>
+  <aside class="notes" hidden>Point at the bedrock.invoke span — token counts are the litmus test for whether OTel is actually wired. Pause on "no manual instrumentation" — that's the line for the AWS-architects in the audience.</aside>
+</section>
+
+<!-- ============ SLIDE 10 — Summary ============ -->
+<section class="slide" data-slide="10">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <div class="label">Recap</div>
+  <h1>Posture, not a demo</h1>
+
+  <div class="grid-2" style="margin-top:24px">
+    <div class="card">
+      <div class="num">Stage I</div>
+      <h3 style="margin-top:8px">Deterministic foundation</h3>
+      <p style="font-size:20px;margin-top:8px">Six rules · pure Python · per-Lambda IAM · manifest SHA-256 = coverage proof. Every finding cites an ISM control.</p>
+    </div>
+    <div class="card">
+      <div class="num">Stage II</div>
+      <h3 style="margin-top:8px">Agent + guardrails</h3>
+      <p style="font-size:20px;margin-top:8px">Strands · 4 read-only tools · 5 layers of defence · OTel-native. Quarantines on any gate fail.</p>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-top:28px">
+    <div class="card" style="text-align:center">
+      <div class="bignum" style="font-size:88px">$5</div>
+      <p style="font-size:18px">/ month, all-in</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <div class="bignum" style="font-size:88px">75s</div>
+      <p style="font-size:18px">end-to-end · weekly run</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <div class="bignum" style="font-size:88px">7y</div>
+      <p style="font-size:18px">PDF retention · S3 Object Lock</p>
+    </div>
+  </div>
+
+  <blockquote style="margin-top:30px"><strong>Rules engine = prosecutor. Agent = barrister. Reviewer = judge.</strong> That's the shape.</blockquote>
+
+  <div class="pageno">10 / 12</div>
+  <aside class="notes" hidden>Slow down. Three numbers ($5 / 75s / 7y) land hardest. Then the prosecutor / barrister / judge line — pause after, then "Questions?"</aside>
+</section>
+
+<!-- ============ SLIDE 11 — Thanks ============ -->
+<section class="slide" data-slide="11">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <h1>Thanks</h1>
+  <h2>Christina Chen — Senior Consultant, Mantel Group</h2>
+
+  <div style="margin-top:30px;font-size:24px;line-height:1.8">
+    <p><span class="tag">email</span> &nbsp; <code>connie0972001@gmail.com</code></p>
+    <p><span class="tag">linkedin</span> &nbsp; <code>/in/christina-chen-au</code></p>
+    <p><span class="tag">repo</span> &nbsp; <code>github.com/cloudchristina/assessor-agent</code> · source on request</p>
+  </div>
+
+  <h3 style="margin-top:40px;color:#7BB7E0;font-weight:600">Ask me about</h3>
+  <div class="grid-3" style="margin-top:16px">
+    <div class="card"><p>Strands native OTel + X-Ray tool spans</p></div>
+    <div class="card"><p>The four read-only tools and how we picked them</p></div>
+    <div class="card"><p>The Plan 2 eval suite (50-case golden, in flight)</p></div>
+  </div>
+
+  <div class="pageno">11 / 12</div>
+  <aside class="notes" hidden>Q&A slide stays up ~3-4 min. If asked anything you can't answer: "Great question — I'll follow up by email." Hand out card. Never bluff in front of regulators-in-the-audience.</aside>
+</section>
+
+<!-- ============ SLIDE 12 — Backup ============ -->
+<section class="slide" data-slide="12">
+  <div class="mark br"><img src="./assets/mantel/image1.png" alt=""><span>Mantel</span></div>
+  <div class="label">Backup · for Q&amp;A only</div>
+  <h1>The six rules in one frame</h1>
+
+  <table style="width:100%;margin-top:22px;border-collapse:collapse;font-size:20px">
+    <tr style="border-bottom:2px solid var(--line)">
+      <th style="text-align:left;padding:10px;color:var(--accent-blue);width:6%">#</th>
+      <th style="text-align:left;padding:10px;color:var(--accent-blue);width:11%">Severity</th>
+      <th style="text-align:left;padding:10px;color:var(--accent-blue);width:33%">Rule</th>
+      <th style="text-align:left;padding:10px;color:var(--accent-blue);width:14%">ISM</th>
+      <th style="text-align:left;padding:10px;color:var(--accent-blue)">Logic</th>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,.08)">
+      <td style="padding:10px"><strong>R1</strong></td><td style="padding:10px;color:#E5777E">CRITICAL</td>
+      <td style="padding:10px">SQL login with Admin access</td><td style="padding:10px">1546</td>
+      <td style="padding:10px"><code>login_type='SQL_LOGIN' AND access_level='Admin'</code></td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,.08)">
+      <td style="padding:10px"><strong>R2</strong></td><td style="padding:10px;color:#E5777E">CRITICAL</td>
+      <td style="padding:10px">Dormant privileged account</td><td style="padding:10px">1509/1555</td>
+      <td style="padding:10px"><code>Admin AND last_active &gt; 90d</code></td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,.08)">
+      <td style="padding:10px"><strong>R3</strong></td><td style="padding:10px;color:#FFB347">HIGH</td>
+      <td style="padding:10px">SoD breach across DEV+PROD</td><td style="padding:10px">1175</td>
+      <td style="padding:10px">cross-DB aggregation by login</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,.08)">
+      <td style="padding:10px"><strong>R4</strong></td><td style="padding:10px;color:#FFB347">HIGH</td>
+      <td style="padding:10px">Orphaned login</td><td style="padding:10px">1555</td>
+      <td style="padding:10px"><code>mapped_user_name</code> empty everywhere</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,.08)">
+      <td style="padding:10px"><strong>R5</strong></td><td style="padding:10px;color:#FFB347">HIGH</td>
+      <td style="padding:10px">RBAC bypass — explicit grant outside any role</td><td style="padding:10px">0445</td>
+      <td style="padding:10px"><code>(read OR write OR admin) AND db_roles=[]</code></td>
+    </tr>
+    <tr>
+      <td style="padding:10px"><strong>R6</strong></td><td style="padding:10px;color:#FFB347">HIGH</td>
+      <td style="padding:10px">Shared / generic account</td><td style="padding:10px">1545</td>
+      <td style="padding:10px">regex on <code>login_name</code></td>
+    </tr>
+  </table>
+
+  <p style="margin-top:24px"><em>Thresholds (90d, regex pattern, etc.) configurable via DDB <code>rule_config</code> in production.</em></p>
+
+  <div class="pageno">12 / 12</div>
+  <aside class="notes" hidden>Use only if asked "what are the actual rules?". Not part of the main flow.</aside>
+</section>
+
+</div></div>
+
+<!-- ============ Presenter overlay ============ -->
+<div id="presenter">
+  <div class="now">
+    <div class="label-sm">Now showing</div>
+    <h3 id="p-now-title">—</h3>
+    <div class="notes" id="p-now-notes">—</div>
+  </div>
+  <div class="right">
+    <div class="timer">
+      <div class="label-sm">Timer · target 25:00</div>
+      <div class="clock" id="p-clock">25:00</div>
+      <div class="target" id="p-target">slide target: —</div>
+      <div class="controls">
+        <button onclick="window._timer.toggle()">start / pause</button>
+        <button onclick="window._timer.reset()">reset</button>
+      </div>
+    </div>
+    <div class="next">
+      <div class="label-sm">Up next</div>
+      <h3 id="p-next-title">—</h3>
+      <div class="notes" id="p-next-notes">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Help overlay ============ -->
+<div id="help"><div class="box">
+  <h3>Keyboard</h3>
+  <dl>
+    <dt>→ · Space · n</dt><dd>Next slide</dd>
+    <dt>← · p</dt><dd>Previous slide</dd>
+    <dt>1–9 · 0</dt><dd>Jump to slide N (0 = 10)</dd>
+    <dt>Home · End</dt><dd>First / last slide</dd>
+    <dt>P</dt><dd>Toggle presenter mode</dd>
+    <dt>F</dt><dd>Toggle fullscreen</dd>
+    <dt>T</dt><dd>Start / pause timer</dd>
+    <dt>?</dt><dd>This help</dd>
+    <dt>Esc</dt><dd>Close overlay</dd>
+  </dl>
+</div></div>
+
+<script>
+  const stage=document.getElementById('stage');
+  function fit(){
+    const sw=window.innerWidth, sh=window.innerHeight;
+    const k=Math.min(sw/1600, sh/900);
+    stage.style.transform=`scale(${k})`;
+  }
+  window.addEventListener('resize',fit); fit();
+
+  const slides=[...document.querySelectorAll('.slide')];
+  const targets=['00:30','02:30','04:00','07:00','09:30','12:00','14:00','19:00','21:00','23:00','24:30','—'];
+  let i=0;
+  function show(n){
+    n=Math.max(0,Math.min(slides.length-1,n));
+    slides[i].classList.remove('active');
+    slides[n].classList.add('active');
+    i=n; updatePresenter();
+  }
+  function next(){show(i+1)} function prev(){show(i-1)}
+  document.addEventListener('keydown',(e)=>{
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='n') {next();e.preventDefault()}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='p') {prev();e.preventDefault()}
+    else if(e.key==='Home') show(0);
+    else if(e.key==='End') show(slides.length-1);
+    else if(/^[1-9]$/.test(e.key)) show(parseInt(e.key,10)-1);
+    else if(e.key==='0') show(9);
+    else if(e.key.toLowerCase()==='f') toggleFs();
+    else if(e.key.toLowerCase()==='t') {window._timer.toggle();e.preventDefault()}
+    else if(e.key.toLowerCase()==='p') {presenter.toggle()}
+    else if(e.key==='?') help.classList.toggle('on');
+    else if(e.key==='Escape'){help.classList.remove('on'); presenter.classList.remove('on')}
+  });
+  document.addEventListener('click',(e)=>{
+    if(e.target.closest('button')||e.target.closest('#help')||e.target.closest('#presenter button')) return;
+    next();
+  });
+  function toggleFs(){
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+  const presenter=document.getElementById('presenter');
+  presenter.toggle=()=>{presenter.classList.toggle('on'); updatePresenter()};
+  function updatePresenter(){
+    const cur=slides[i], nxt=slides[i+1];
+    const t=(s)=>s?(s.querySelector('h1')?.textContent||s.querySelector('.bignum')?.textContent||'—'):'—';
+    const n=(s)=>s?(s.querySelector('aside.notes')?.textContent||'(no notes)'):'';
+    document.getElementById('p-now-title').textContent=`Slide ${i+1} · ${t(cur)}`;
+    document.getElementById('p-now-notes').textContent=n(cur);
+    document.getElementById('p-next-title').textContent=nxt?`Slide ${i+2} · ${t(nxt)}`:'(end of deck)';
+    document.getElementById('p-next-notes').textContent=n(nxt);
+    document.getElementById('p-target').textContent=`slide target: ${targets[i]||'—'}`;
+  }
+  window._timer={ms:25*60*1000, last:null, running:false,
+    toggle(){this.running=!this.running; this.last=performance.now(); if(this.running) requestAnimationFrame(this.tick)},
+    reset(){this.running=false; this.ms=25*60*1000; this.render()},
+    tick:(t)=>{
+      const T=window._timer; if(!T.running) return;
+      const dt=t-(T.last||t); T.last=t;
+      T.ms=Math.max(0,T.ms-dt); T.render();
+      if(T.ms>0) requestAnimationFrame(T.tick);
+    },
+    render(){
+      const s=Math.ceil(this.ms/1000);
+      const m=Math.floor(s/60), r=String(s%60).padStart(2,'0');
+      const el=document.getElementById('p-clock');
+      el.textContent=`${m}:${r}`;
+      el.style.color = this.ms<60000 ? '#E5777E' : (this.ms<300000 ? '#FFB347' : '#fff');
+    }
+  };
+  window._timer.render(); updatePresenter();
+
+  const help=document.getElementById('help');
+  let ct; document.addEventListener('mousemove',()=>{
+    document.body.style.cursor='auto'; clearTimeout(ct);
+    ct=setTimeout(()=>{if(document.fullscreenElement) document.body.style.cursor='none'},2500);
+  });
+</script>
+</body>
+</html>
