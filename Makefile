@@ -36,4 +36,4 @@ eval-full:
 	.venv/bin/python -m scripts.eval_run --suite=full --out=eval_run.json
 
 eval-property:
-	.venv/bin/pytest tests/unit/test_property_invariants.py -v
+	.venv/bin/python -m pytest tests/unit/test_property_invariants.py -v
