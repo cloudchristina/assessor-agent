@@ -43,14 +43,16 @@ def test_canary_orchestrator_writes_three_results() -> None:
     # Snapshot current row count
     before = canary_table.scan(Select="COUNT")["Count"]
 
-    # Trigger canary orchestrator
+    # Trigger canary orchestrator asynchronously — synchronous (RequestResponse)
+    # invocations time out at boto3's 60s default while the Lambda runs ~9 min
+    # for 3 sequential SFN executions. Async invoke + DDB poll is the right
+    # shape for end-to-end orchestration tests.
     resp = lam.invoke(
         FunctionName=os.environ["CANARY_ORCHESTRATOR_FUNCTION_NAME"],
-        InvocationType="RequestResponse",
+        InvocationType="Event",
         Payload=json.dumps({}),
     )
-    payload = json.loads(resp["Payload"].read())
-    assert resp["StatusCode"] == 200, f"invoke failed: {payload}"
+    assert resp["StatusCode"] == 202, f"async invoke failed: status={resp['StatusCode']}"
 
     # Allow time for async writes — canary processes 3 fixtures sequentially via SFN
     deadline = time.time() + 600  # 10 minutes
