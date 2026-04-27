@@ -24,3 +24,5 @@ infra/terraform/modules/*/.build/
 .DS_Store
 .claude/
 infra/terraform/*.tfplan
+docs/talk/
+.superpowers/
