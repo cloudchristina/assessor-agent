@@ -80,7 +80,9 @@ EventBridge Scheduler fires Step Functions on weekly + monthly crons → SFN run
 
 ## In-flight work
 
-- **Plan 2 (eval suite)** — brainstorm in progress. Scope: full 5-layer eval per spec Section 5. Status: paused at architecture confirmation; needs design doc.
-- **Plan 3 (frontend dashboard)** — Amplify React + Cognito + AppSync + DDB. Not started.
-- **Plan 4 (realistic test data + tracing observation)** — synthetic-data generator with abnormal-activity scenarios + demo runbook. Not started.
+- **Plan 2 (eval suite)** — **DESIGNED**, not started. Design doc at `docs/superpowers/specs/2026-04-25-plan2-eval-suite-design.md`; task plan at `docs/superpowers/plans/2026-04-25-plan2-eval-suite.md` (96 tasks, 0 checked). L1 / L2 / L3 of the eval stack are already live in the deployed pipeline; L4 (offline CI evals — `evals/`, `src/eval_harness/`, `scripts/eval_run.py`, GH Actions gate) and L5 (drift / shadow / canary / reviewer-disagreement Lambdas) are the unbuilt portion.
+- **Plan 3 (frontend dashboard)** — Amplify React + Cognito + AppSync + DDB. **Not started.** No spec, no plan file.
+- **Plan 4 (realistic test data + tracing observation)** — **PARTIAL.** Already shipped: `docs/talk/runbook.md` (T-90 pre-flight + per-segment cues), `docs/talk/capture-list.md` (D1/D2/D3 diagram brief + screenshot list), `scripts/synth_data.py` (basic generator with `--include-injection`), `tests/fixtures/prompt_injection_row.csv`, `tests/fixtures/synthetic_uar_minimal.csv`. Still to build: full multi-scenario generator that the runbook calls (`scripts/seed_synthetic.py` referenced but missing), backup GIFs (`docs/talk/assets/captures/` empty), the three diagrams (`docs/talk/assets/diagrams/` missing), and the `make demo-rehearsal` target.
+- **Talk deck (`docs/talk/slides.html`)** — 15 slides; HITL at slide 9, monthly-attestation PDF mock at slide 10, "What's not in this demo" scope-honesty slide at slide 13. Recently corrected: RDS MySQL → SQL Server, `us.anthropic` → `apac.anthropic` model id, slide 7 L4 badge now `PLANNED`.
 - **Open question:** verify the deployed PR #1 fix actually shows tool-call spans in X-Ray on the next live run.
+- **Stale runbook reference:** `docs/talk/runbook.md` calls `python scripts/seed_synthetic.py --date today` and `make demo-rehearsal`, neither of which exist. Plan 4 work needs to either build them or fix the runbook to call `scripts/synth_data.py`.
