@@ -1,0 +1,9 @@
+{
+  "case_id": "case_004_no_findings",
+  "input_csv": "evals/golden/fixtures/case_004.csv",
+  "expected_findings": [],
+  "expected_counts": {"R1": 0, "R2": 0, "R3": 0, "R4": 0, "R5": 0, "R6": 0},
+  "must_mention": [],
+  "must_not_mention": ["finding", "violation", "breach"],
+  "notes": "Three well-behaved Windows logins with proper roles, recent activity (within last 30 days), all in single database appdb, all with mapped_user_name and db_datareader role. Distinct non-pattern-matching names (analyst_jane, developer_kate, auditor_paul) avoid R6. Tests narrator's ability to handle empty-findings case without fabrication."
+}

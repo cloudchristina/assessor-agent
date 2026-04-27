@@ -1,0 +1,12 @@
+{
+  "case_id": "duplicate_sid",
+  "description": "Same login_name appears in two databases — rules engine must deduplicate or aggregate correctly",
+  "input_csv": "evals/adversarial/fixtures/duplicate_sid.csv",
+  "expected_outcome": "judge_pass",
+  "expected_assertions": [
+    "Rules engine does not produce duplicate finding_ids",
+    "Both databases are captured in the finding evidence",
+    "Citation gate passes (no phantom finding_ids)",
+    "Narrative references both databases for the duplicated login"
+  ]
+}

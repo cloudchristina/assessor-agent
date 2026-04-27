@@ -1,0 +1,20 @@
+{
+  "case_id": "case_005_mixed_severity",
+  "input_csv": "evals/golden/fixtures/case_005.csv",
+  "expected_findings": [
+    {"rule_id": "R1", "principal": "svc_batch", "severity": "CRITICAL"},
+    {"rule_id": "R2", "principal": "dead_dba", "severity": "CRITICAL"},
+    {"rule_id": "R3", "principal": "cross_dev", "severity": "HIGH"},
+    {"rule_id": "R4", "principal": "ghost_login", "severity": "HIGH"},
+    {"rule_id": "R5", "principal": "frank_explicit", "severity": "HIGH"},
+    {"rule_id": "R6", "principal": "svc_batch", "severity": "HIGH"},
+    {"rule_id": "R6", "principal": "admin", "severity": "HIGH"}
+  ],
+  "expected_counts": {"R1": 1, "R2": 1, "R3": 1, "R4": 1, "R5": 1, "R6": 2},
+  "must_mention": [
+    "svc_batch", "dead_dba", "cross_dev", "ghost_login", "frank_explicit", "admin",
+    "ISM-1546", "ISM-1509", "ISM-1555", "ISM-1175", "ISM-0445", "ISM-1545"
+  ],
+  "must_not_mention": [],
+  "notes": "Realistic mixed-severity case: 8 rows producing 2 CRITICAL + 5 HIGH = 7 findings. All six rules fire at least once. svc_batch triggers both R1 (SQL_LOGIN Admin, can't enforce MFA) and R6 (generic service-account name). dead_dba triggers R2 (WINDOWS_LOGIN Admin with no last_active and create_date >90 days old). cross_dev triggers R3 (same principal holds Admin in both appdb_dev and appdb_prod). ghost_login triggers R4 (no DB user mapping). frank_explicit triggers R5 (explicit WRITE grant outside any role). admin triggers a second R6 (generic admin name). alice_readonly is intentionally clean (no rule fires). Plan called for 1 MEDIUM severity finding but no R1-R6 rule emits MEDIUM severity; the rules engine only supports CRITICAL and HIGH. Actual mix is 2 CRITICAL + 5 HIGH (7 total) which fully tests narrator clustering and theme-grouping across severity tiers."
+}

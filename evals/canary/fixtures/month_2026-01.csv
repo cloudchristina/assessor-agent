@@ -1,0 +1,6 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+sod_user,WINDOWS_LOGIN,2022-01-01 00:00:00,2026-04-20 09:00:00,,appdb_dev (sql01),sod_user,USER,dbo,db_owner,False,False,False,False,Admin,,
+sod_user,WINDOWS_LOGIN,2022-01-01 00:00:00,2026-04-20 09:00:00,,appdb_prod (sql01),sod_user,USER,dbo,db_owner,False,False,False,False,Admin,,
+svc_api,WINDOWS_LOGIN,2024-03-01 00:00:00,2026-01-20 10:00:00,,appdb (sql01),svc_api,USER,dbo,db_datareader,False,False,False,False,ReadOnly,,
+app_reports,WINDOWS_LOGIN,2024-04-01 00:00:00,2026-01-18 11:00:00,,appdb (sql01),app_reports,USER,dbo,db_datareader,False,False,False,False,ReadOnly,,
+alice_normal,WINDOWS_LOGIN,2023-01-01 00:00:00,2026-01-19 12:00:00,,appdb (sql01),alice_normal,USER,dbo,db_datareader,False,False,False,False,ReadOnly,,

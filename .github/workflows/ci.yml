@@ -3,6 +3,14 @@ on:
   pull_request:
   push:
     branches: [main]
+  schedule:
+    - cron: '0 14 * * *'   # 00:00 AEST daily — full eval gate
+  workflow_dispatch:
+    inputs:
+      suite:
+        type: choice
+        options: [smoke, full]
+        default: smoke
 
 jobs:
   python:
@@ -34,3 +42,66 @@ jobs:
       - uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: infra/terraform
+
+  property-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install uv && uv pip install --system -e ".[dev]"
+      - run: pytest tests/unit/test_property_invariants.py -v --hypothesis-seed=0
+
+  eval-advisory:
+    needs: [python, property-tests]
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.EVAL_GATE_ROLE_ARN }}
+          aws-region: ap-southeast-2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install uv && uv pip install --system -e ".[dev]"
+      - run: python -m scripts.eval_run --suite=smoke --out=eval_run.json
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { comment } = require('./scripts/eval_pr_comment.js')
+            await comment(github, context, 'eval_run.json')
+      # NOTE: do NOT call eval_check here — PRs are advisory.
+
+  eval-gate:
+    needs: [python, property-tests]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.EVAL_GATE_ROLE_ARN }}
+          aws-region: ap-southeast-2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install uv && uv pip install --system -e ".[dev]"
+      - id: suite
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "name=full" >> $GITHUB_OUTPUT
+          else
+            echo "name=smoke" >> $GITHUB_OUTPUT
+          fi
+      - run: python -m scripts.eval_run --suite=${{ steps.suite.outputs.name }} --out=eval_run.json
+      - run: python -m scripts.eval_check --in=eval_run.json

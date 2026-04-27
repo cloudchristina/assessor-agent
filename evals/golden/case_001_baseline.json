@@ -1,0 +1,16 @@
+{
+  "case_id": "case_001_baseline",
+  "input_csv": "evals/golden/fixtures/case_001.csv",
+  "expected_findings": [
+    {"rule_id": "R1", "principal": "svc_app", "severity": "CRITICAL"},
+    {"rule_id": "R6", "principal": "svc_app", "severity": "HIGH"},
+    {"rule_id": "R2", "principal": "alice_dba", "severity": "CRITICAL"},
+    {"rule_id": "R4", "principal": "bob_orphan", "severity": "HIGH"},
+    {"rule_id": "R5", "principal": "carol_explicit", "severity": "HIGH"},
+    {"rule_id": "R6", "principal": "admin", "severity": "HIGH"}
+  ],
+  "expected_counts": {"R1": 1, "R2": 1, "R3": 0, "R4": 1, "R5": 1, "R6": 2},
+  "must_mention": ["svc_app", "alice_dba", "bob_orphan", "carol_explicit", "admin", "ISM-1546", "ISM-1509", "ISM-1555", "ISM-0445", "ISM-1545"],
+  "must_not_mention": ["dave", "appdb_prod"],
+  "notes": "Hand-crafted baseline: each rule fires once except R3 (needs cross-DB). Tests the agent's ability to narrate a realistic mixed cycle."
+}

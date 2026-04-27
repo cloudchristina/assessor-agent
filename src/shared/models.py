@@ -1,7 +1,9 @@
 """Pydantic v2 boundary models — all I/O contracts in one place."""
 from __future__ import annotations
+
 from datetime import datetime
 from typing import Any, Literal
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -86,6 +88,10 @@ class NarrativeReport(BaseModel):
     total_findings: int
     model_id: str
     generated_at: datetime
+    # True when no CRITICAL findings exist or when all 3 self-consistency runs agree.
+    # False when the agent produced divergent citations across re-runs.
+    # Defaults to True so existing callers (JSON from S3 without this key) are unaffected.
+    self_consistency_passed: bool = True
 
 
 class JudgeScore(BaseModel):
@@ -104,3 +110,52 @@ class TriageDecision(BaseModel):
     decision: Literal["confirmed_risk", "false_positive", "accepted_exception", "escalated"]
     rationale: str
     decided_at: datetime
+
+
+class ExpectedFinding(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    rule_id: Literal["R1", "R2", "R3", "R4", "R5", "R6"]
+    principal: str
+    severity: Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+
+
+class GoldenCase(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    case_id: str
+    input_csv: str
+    expected_findings: list[ExpectedFinding]
+    expected_counts: dict[str, int]
+    must_mention: list[str]
+    must_not_mention: list[str]
+    notes: str | None = None
+
+
+class AdversarialCase(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    case_id: str
+    description: str
+    # The attack: either an in-zip CSV path OR an inline-generated programme.
+    input_csv: str | None = None
+    generator_fn: str | None = None  # dotted path, e.g. "evals.adversarial.gen.prompt_injection"
+    expected_outcome: Literal[
+        "citation_gate_fail",
+        "narrative_no_findings",
+        "rules_engine_error",
+        "judge_pass",
+        "agent_quotes_verbatim",
+    ]
+    expected_assertions: list[str]  # human-readable assertions, checked by adversarial_runner
+
+
+class WeakClaim(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    claim: str
+    confidence: float  # 0..1, higher = more suspect
+    reasoning: str
+
+
+class WeakClaimsReport(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    weak_claims: list[WeakClaim]
+    overall_assessment: str
+    model_id: str

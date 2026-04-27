@@ -1,0 +1,6 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+old_dba,WINDOWS_LOGIN,2020-01-01 00:00:00,2025-07-01 00:00:00,,appdb (sql01),old_dba,USER,dbo,db_owner,False,False,False,False,Admin,,
+dec_explicit,WINDOWS_LOGIN,2025-01-01 00:00:00,2025-12-15 09:00:00,,appdb (sql01),dec_explicit,USER,sales,,True,False,False,False,ReadOnly,SELECT=3,
+admin,SQL_LOGIN,2024-02-01 00:00:00,2025-12-20 10:00:00,,appdb (sql01),admin,USER,dbo,db_datareader,False,False,False,False,ReadOnly,SELECT=1,
+alice_normal,WINDOWS_LOGIN,2023-01-01 00:00:00,2025-12-18 11:00:00,,appdb (sql01),alice_normal,USER,dbo,db_datareader,False,False,False,False,ReadOnly,,
+bob_normal,WINDOWS_LOGIN,2023-06-01 00:00:00,2025-12-17 12:00:00,,appdb (sql01),bob_normal,USER,dbo,db_datareader,False,False,False,False,ReadOnly,,

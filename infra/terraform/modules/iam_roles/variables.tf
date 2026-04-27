@@ -40,3 +40,24 @@ variable "guardrail_arn" {
   default     = ""
   description = "Optional — empty string means no guardrail constraint on InvokeModel."
 }
+
+variable "drift_signals_table_arn" {
+  type        = string
+  description = "ARN of the drift-signals DynamoDB table."
+}
+
+variable "canary_results_table_arn" {
+  type        = string
+  description = "ARN of the canary-results DynamoDB table."
+}
+
+variable "drift_baseline_table_arn" {
+  type        = string
+  description = "ARN of the drift-baseline DynamoDB table."
+}
+
+variable "golden_set_candidates_table_arn" {
+  type        = string
+  description = "ARN of the golden-set-candidates DynamoDB table."
+}
+

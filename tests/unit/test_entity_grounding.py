@@ -109,3 +109,52 @@ def test_grounding_passes_on_correct_no_findings_statement():
     _setup_buckets([], narrative)
     out = lambda_handler(_event(), None)
     assert out["passed"] is True
+
+
+@mock_aws
+def test_entity_grounding_gate_quarantines_on_self_consistency_failure():
+    """Gate must fail when narrative has self_consistency_passed=False, even if
+    all entity and negation checks pass."""
+    findings = [{
+        "finding_id": "F-1", "principal": "alice",
+        "databases": ["appdb_prod"], "ism_controls": ["ISM-1546"],
+    }]
+    narrative = {
+        "executive_summary": "Login `alice` flagged on `appdb_prod` per ISM-1546.",
+        "theme_clusters": [],
+        "finding_narratives": [],
+        "self_consistency_passed": False,
+    }
+    _setup_buckets(findings, narrative)
+    out = lambda_handler(_event(), None)
+    assert out["passed"] is False
+    assert out["passed_int"] == 0
+    assert out["self_consistency_failed"] is True
+
+
+@mock_aws
+def test_entity_grounding_gate_self_consistency_default_passes():
+    """When self_consistency_passed is absent (default True), gate is not blocked by it."""
+    findings = [{
+        "finding_id": "F-1", "principal": "alice",
+        "databases": ["appdb_prod"], "ism_controls": ["ISM-1546"],
+    }]
+    # Narrative with no self_consistency_passed key — must default to True
+    narrative = {
+        "executive_summary": "Login `alice` flagged on `appdb_prod` per ISM-1546.",
+        "theme_clusters": [],
+        "finding_narratives": [],
+        # intentionally absent: "self_consistency_passed"
+    }
+    _setup_buckets(findings, narrative)
+    out = lambda_handler(_event(), None)
+    assert out["passed"] is True
+    assert out["self_consistency_failed"] is False
+
+
+@mock_aws
+def test_entity_grounding_gate_returns_self_consistency_failed_key():
+    """The return dict always includes self_consistency_failed key."""
+    _setup_buckets([], {"executive_summary": "No findings.", "theme_clusters": [], "finding_narratives": []})
+    out = lambda_handler(_event(), None)
+    assert "self_consistency_failed" in out

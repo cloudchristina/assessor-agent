@@ -5,5 +5,9 @@ target-version = "py313"
 select = ["E", "F", "W", "I", "B", "C4", "UP", "S", "RUF"]
 ignore = ["S101"]
 
+[lint.isort]
+known-first-party = ["src", "evals"]
+
 [lint.per-file-ignores]
-"tests/**" = ["S105", "S106"]
+"tests/**" = ["S105", "S106", "S603"]
+"scripts/**" = ["S603"]

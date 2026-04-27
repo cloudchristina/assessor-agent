@@ -63,11 +63,16 @@ def test_handler_writes_narrative_to_s3():
 
     # Critical: handler MUST call agent(...) with structured_output_model, not
     # the deprecated agent.structured_output(...) method.
-    fake_agent.assert_called_once()
-    call_kwargs = fake_agent.call_args.kwargs
-    assert call_kwargs.get("structured_output_model") is NarrativeReport, (
-        "handler must use modern Strands API: agent(prompt, structured_output_model=...)"
+    # With CRITICAL findings in the summary the self-consistency check fires,
+    # so the agent is called 3× total (1 primary + 2 extra at temperature=0.3).
+    assert fake_agent.call_count == 3, (
+        f"Expected 3 agent calls (1 primary + 2 self-consistency), got {fake_agent.call_count}"
     )
+    # All calls must use the modern structured-output API.
+    for call in fake_agent.call_args_list:
+        assert call.kwargs.get("structured_output_model") is NarrativeReport, (
+            "handler must use modern Strands API: agent(prompt, structured_output_model=...)"
+        )
 
     body = s3.get_object(Bucket="test-bucket-123", Key="narratives/run_x/narrative.json")["Body"].read()
     data = json.loads(body)

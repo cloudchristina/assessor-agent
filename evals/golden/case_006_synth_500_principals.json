@@ -1,0 +1,392 @@
+{
+  "case_id": "synth_500_principals",
+  "input_csv": "evals/golden/fixtures/case_006.csv",
+  "expected_findings": [
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_0",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_1",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_2",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_3",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_4",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_5",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_6",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_7",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_8",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_9",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_10",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_11",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_12",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_13",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_14",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_15",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_16",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_17",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_18",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_19",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_20",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_21",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_22",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_23",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R1",
+      "principal": "svc_etl_24",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_25",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_26",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_27",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_28",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_29",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_30",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_31",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_32",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_33",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_34",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_35",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_36",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_37",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_38",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R2",
+      "principal": "old_admin_39",
+      "severity": "CRITICAL"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_0",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_1",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_2",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_3",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_4",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_5",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_6",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_7",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_8",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_9",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_10",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_11",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_12",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_13",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_14",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_15",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_16",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_17",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_18",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_19",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_20",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_21",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_22",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_23",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "svc_etl_24",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_40",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_41",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_42",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_43",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_44",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_45",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_46",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_47",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_48",
+      "severity": "HIGH"
+    },
+    {
+      "rule_id": "R6",
+      "principal": "app_49",
+      "severity": "HIGH"
+    }
+  ],
+  "expected_counts": {
+    "R1": 25,
+    "R2": 15,
+    "R3": 0,
+    "R4": 0,
+    "R5": 0,
+    "R6": 35
+  },
+  "must_mention": [],
+  "must_not_mention": [],
+  "notes": "Synthetic case generated by scripts/generate_golden.py --scenario=synth_500_principals"
+}

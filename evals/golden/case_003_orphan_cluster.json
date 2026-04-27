@@ -1,0 +1,15 @@
+{
+  "case_id": "case_003_orphan_cluster",
+  "input_csv": "evals/golden/fixtures/case_003.csv",
+  "expected_findings": [
+    {"rule_id": "R4", "principal": "acme_vendor_1", "severity": "HIGH"},
+    {"rule_id": "R4", "principal": "acme_vendor_2", "severity": "HIGH"},
+    {"rule_id": "R4", "principal": "acme_vendor_3", "severity": "HIGH"},
+    {"rule_id": "R4", "principal": "acme_vendor_4", "severity": "HIGH"},
+    {"rule_id": "R4", "principal": "acme_vendor_5", "severity": "HIGH"}
+  ],
+  "expected_counts": {"R1": 0, "R2": 0, "R3": 0, "R4": 5, "R5": 0, "R6": 0},
+  "must_mention": ["acme_vendor_1", "acme_vendor_2", "acme_vendor_3", "acme_vendor_4", "acme_vendor_5", "ISM-1555"],
+  "must_not_mention": [],
+  "notes": "Five vendor accounts with empty mapped_user_name across all rows — each triggers R4 orphaned login. Acme_vendor names avoid R6 shared-account pattern. Tests agent's handling of homogeneous multi-principal findings."
+}

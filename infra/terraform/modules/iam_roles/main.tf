@@ -54,6 +54,12 @@ locals {
     "judge",
     "publish_triage",
     "generate_pdf",
+    "adversarial_probe",
+    "reviewer_disagreement_digest",
+    "shadow_eval",
+    "canary_orchestrator",
+    "drift_detector",
+    "reviewer_disagreement",
   ]
 }
 
@@ -329,6 +335,219 @@ resource "aws_iam_role_policy" "generate_pdf" {
   name   = "generate-pdf"
   role   = aws_iam_role.lambda["generate_pdf"].id
   policy = data.aws_iam_policy_document.generate_pdf.json
+}
+
+# ---------------- adversarial-probe ----------------
+data "aws_iam_policy_document" "adversarial_probe" {
+  statement {
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
+    resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${var.runs_bucket_arn}/narratives/*", "${var.runs_bucket_arn}/rules/*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [var.kms_findings_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "adversarial_probe" {
+  name   = "adversarial-probe"
+  role   = aws_iam_role.lambda["adversarial_probe"].id
+  policy = data.aws_iam_policy_document.adversarial_probe.json
+}
+
+# ---------------- reviewer-disagreement-digest ----------------
+data "aws_iam_policy_document" "reviewer_disagreement_digest" {
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:Scan"]
+    resources = ["arn:aws:dynamodb:*:*:table/${var.name_prefix}-golden-set-candidates"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendEmail"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "reviewer_disagreement_digest" {
+  name   = "reviewer-disagreement-digest"
+  role   = aws_iam_role.lambda["reviewer_disagreement_digest"].id
+  policy = data.aws_iam_policy_document.reviewer_disagreement_digest.json
+}
+
+# ---------------- shadow-eval ----------------
+# Triggered by DDB Streams (runs INSERT). Invokes judge Lambda for Bedrock
+# scoring, writes shadow_score back to runs, writes drift signal to
+# drift_signals table.
+data "aws_iam_policy_document" "shadow_eval" {
+  statement {
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
+    resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem"]
+    resources = [var.runs_table_arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${var.runs_bucket_arn}/narratives/*", "${var.runs_bucket_arn}/rules/*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:UpdateItem"]
+    resources = [var.runs_table_arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:PutItem"]
+    resources = [var.drift_signals_table_arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = ["arn:aws:lambda:*:*:function:*-judge"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [var.kms_findings_arn]
+  }
+  # DDB Streams access (for event source mapping)
+  statement {
+    effect = "Allow"
+    actions = [
+      "dynamodb:GetRecords",
+      "dynamodb:GetShardIterator",
+      "dynamodb:DescribeStream",
+      "dynamodb:ListStreams",
+    ]
+    resources = ["${var.runs_table_arn}/stream/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "shadow_eval" {
+  name   = "shadow-eval"
+  role   = aws_iam_role.lambda["shadow_eval"].id
+  policy = data.aws_iam_policy_document.shadow_eval.json
+}
+
+# ---------------- canary-orchestrator ----------------
+# Triggered by EventBridge weekly cron. Starts a Step Functions execution
+# with a synthetic fixture, waits, then writes canary results to DDB.
+data "aws_iam_policy_document" "canary_orchestrator" {
+  statement {
+    effect    = "Allow"
+    actions   = ["states:StartExecution"]
+    resources = ["arn:aws:states:*:*:stateMachine:${var.name_prefix}-*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["states:DescribeExecution"]
+    # DescribeExecution operates on execution ARNs, distinct from stateMachine ARNs.
+    resources = ["arn:aws:states:*:*:execution:${var.name_prefix}-*:*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:PutItem"]
+    resources = [var.canary_results_table_arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem"]
+    resources = [var.runs_table_arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:PutObject", "s3:GetObject"]
+    resources = ["${var.runs_bucket_arn}/fixtures/*", "${var.runs_bucket_arn}/canary/*"]
+  }
+  statement {
+    effect  = "Allow"
+    actions = ["kms:Encrypt", "kms:Decrypt", "kms:GenerateDataKey"]
+    # Needs both raw (S3 fixture upload + read) and findings (runs DDB table SSE).
+    resources = [var.kms_raw_arn, var.kms_findings_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "canary_orchestrator" {
+  name   = "canary-orchestrator"
+  role   = aws_iam_role.lambda["canary_orchestrator"].id
+  policy = data.aws_iam_policy_document.canary_orchestrator.json
+}
+
+# ---------------- drift-detector ----------------
+# Triggered by EventBridge weekly cron. Scans runs table, writes drift
+# signals and drift baseline.
+data "aws_iam_policy_document" "drift_detector" {
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:Query", "dynamodb:Scan"]
+    resources = [var.runs_table_arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:PutItem"]
+    resources = [var.drift_signals_table_arn, var.drift_baseline_table_arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [var.kms_findings_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "drift_detector" {
+  name   = "drift-detector"
+  role   = aws_iam_role.lambda["drift_detector"].id
+  policy = data.aws_iam_policy_document.drift_detector.json
+}
+
+# ---------------- reviewer-disagreement ----------------
+# Triggered by DDB Streams (findings MODIFY). Promotes high-disagreement
+# findings to the golden-set-candidates table.
+data "aws_iam_policy_document" "reviewer_disagreement" {
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem"]
+    resources = [var.findings_table_arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:PutItem"]
+    resources = [var.golden_set_candidates_table_arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [var.kms_findings_arn]
+  }
+  # DDB Streams access (for event source mapping)
+  statement {
+    effect = "Allow"
+    actions = [
+      "dynamodb:GetRecords",
+      "dynamodb:GetShardIterator",
+      "dynamodb:DescribeStream",
+      "dynamodb:ListStreams",
+    ]
+    resources = ["${var.findings_table_arn}/stream/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "reviewer_disagreement" {
+  name   = "reviewer-disagreement"
+  role   = aws_iam_role.lambda["reviewer_disagreement"].id
+  policy = data.aws_iam_policy_document.reviewer_disagreement.json
 }
 
 # ---------------- step-functions ----------------

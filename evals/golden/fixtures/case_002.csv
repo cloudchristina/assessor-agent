@@ -1,0 +1,3 @@
+login_name,login_type,login_create_date,last_active_date,server_roles,database,mapped_user_name,user_type,default_schema,db_roles,explicit_read,explicit_write,explicit_exec,explicit_admin,access_level,grant_counts,deny_counts
+svc_etl,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-24 12:00:00,,appdb_dev (sql01),svc_etl,USER,dbo,db_owner,False,False,False,False,Admin,,
+svc_etl,WINDOWS_LOGIN,2024-01-01 00:00:00,2026-04-24 12:00:00,,appdb_prod (sql01),svc_etl,USER,dbo,db_owner,False,False,False,False,Admin,,

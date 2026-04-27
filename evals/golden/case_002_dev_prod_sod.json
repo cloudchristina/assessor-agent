@@ -1,0 +1,12 @@
+{
+  "case_id": "case_002_dev_prod_sod",
+  "input_csv": "evals/golden/fixtures/case_002.csv",
+  "expected_findings": [
+    {"rule_id": "R3", "principal": "svc_etl", "severity": "HIGH"},
+    {"rule_id": "R6", "principal": "svc_etl", "severity": "HIGH"}
+  ],
+  "expected_counts": {"R1": 0, "R2": 0, "R3": 1, "R4": 0, "R5": 0, "R6": 1},
+  "must_mention": ["svc_etl", "appdb_dev", "appdb_prod", "ISM-1175", "ISM-1545"],
+  "must_not_mention": ["alice_dba", "bob_orphan", "carol_explicit", "admin"],
+  "notes": "R3 fires on svc_etl holding admin in both dev+prod. R6 fires on svc_etl matching shared-account regex. No cross-rule interactions."
+}

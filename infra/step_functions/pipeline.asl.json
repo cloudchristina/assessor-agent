@@ -252,12 +252,63 @@
         {
           "Variable": "$.judge.passed",
           "BooleanEquals": true,
+          "Next": "AdversarialProbe"
+        }
+      ],
+      "Default": "MarkQuarantined"
+    },
+    "AdversarialProbe": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${adversarial_probe_arn}",
+        "Payload": {
+          "narrative_s3_uri.$": "$.narrative.narrative_s3_uri",
+          "findings_s3_uri.$": "$.rules.findings_s3_uri"
+        }
+      },
+      "ResultSelector": {
+        "passed.$": "$.Payload.passed",
+        "passed_int.$": "$.Payload.passed_int",
+        "weak_claims.$": "$.Payload.weak_claims"
+      },
+      "ResultPath": "$.adversarial",
+      "Retry": [
+        {
+          "ErrorEquals": ["Bedrock.ThrottlingException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 3,
+          "BackoffRate": 2.0,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "AdversarialChoice"
+    },
+    "AdversarialChoice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.adversarial.passed",
+          "BooleanEquals": true,
           "Next": "Publish"
         }
       ],
       "Default": "MarkQuarantined"
     },
     "MarkQuarantined": {
+      "Type": "Pass",
+      "Parameters": {
+        "passed": false,
+        "passed_int": 0,
+        "faithfulness": 0,
+        "completeness": 0,
+        "fabrication": 1.0,
+        "reasoning": "Quarantined upstream — Judge not run",
+        "model_id": "n/a"
+      },
+      "ResultPath": "$.judge",
+      "Next": "MarkQuarantineFlag"
+    },
+    "MarkQuarantineFlag": {
       "Type": "Pass",
       "Parameters": {
         "all_gates_passed": false
