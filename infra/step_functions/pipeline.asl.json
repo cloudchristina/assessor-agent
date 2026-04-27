@@ -255,7 +255,7 @@
           "Next": "AdversarialProbe"
         }
       ],
-      "Default": "MarkQuarantined"
+      "Default": "MarkQuarantinedPostJudge"
     },
     "AdversarialProbe": {
       "Type": "Task",
@@ -289,12 +289,22 @@
         {
           "Variable": "$.adversarial.passed",
           "BooleanEquals": true,
-          "Next": "Publish"
+          "Next": "MarkSucceeded"
         }
       ],
-      "Default": "MarkQuarantined"
+      "Default": "MarkQuarantinedPostJudge"
+    },
+    "MarkSucceeded": {
+      "Comment": "Sets $.quarantine.all_gates_passed=true on the happy path so Publish reads quarantine state from one consistent location across all branches.",
+      "Type": "Pass",
+      "Parameters": {
+        "all_gates_passed": true
+      },
+      "ResultPath": "$.quarantine",
+      "Next": "Publish"
     },
     "MarkQuarantined": {
+      "Comment": "Quarantine path entered when GateChoice fails — Judge has NOT run, so synthesize default $.judge so Publish can read judge_score.* from input.",
       "Type": "Pass",
       "Parameters": {
         "passed": false,
@@ -306,9 +316,10 @@
         "model_id": "n/a"
       },
       "ResultPath": "$.judge",
-      "Next": "MarkQuarantineFlag"
+      "Next": "MarkQuarantinedPostJudge"
     },
-    "MarkQuarantineFlag": {
+    "MarkQuarantinedPostJudge": {
+      "Comment": "Sets $.quarantine flag and routes to Publish. Reachable directly from JudgeChoice/AdversarialChoice (Judge result preserved) or via MarkQuarantined (Judge result synthesized).",
       "Type": "Pass",
       "Parameters": {
         "all_gates_passed": false
@@ -330,7 +341,7 @@
           "narrative_s3_uri.$": "$.narrative.narrative_s3_uri",
           "gates.$": "$.gates",
           "judge_score.$": "$.judge",
-          "all_gates_passed.$": "$.judge.passed",
+          "all_gates_passed.$": "$.quarantine.all_gates_passed",
           "trace_id.$": "$$.Execution.Name"
         }
       },
